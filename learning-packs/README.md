@@ -13,6 +13,7 @@ projects you've actually built rather than a generic course.
 |---|---------|---------------|------|
 | 1 | Wordle clone | [wordle.md](./wordle.md) | [`/wordle`](../wordle) |
 | 2 | To-do list | [todo.md](./todo.md) | [`/todo`](../todo) |
+| 3 | Fractional PMM website | [fractional-pmm-website.md](./fractional-pmm-website.md) | [`/fractional-pmm-website`](../fractional-pmm-website) |
 
 ## Concepts covered so far
 
@@ -38,3 +39,10 @@ actually new each time).
 - Responsive/mobile-friendly design (viewport meta tag, `box-sizing`,
   touch target sizing, Grid `fr` units, `aspect-ratio`, `clamp()`,
   proportional Flexbox sizing)
+- Semantic HTML5 landmark elements (`header`, `nav`, `main`, `section`,
+  `footer`)
+- CSS custom properties (variables)
+- `position: sticky` and `scroll-behavior: smooth`
+- CSS Grid with `repeat(auto-fit, minmax(...))` for responsive layouts
+  without media queries
+- The `robots` meta tag and what "private" means on a static host
