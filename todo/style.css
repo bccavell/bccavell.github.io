@@ -1,0 +1,97 @@
+/*
+  Same dark theme as the Wordle page, so the site feels consistent.
+  Nothing new to learn in this file - it reuses ideas from
+  wordle/style.css (selectors, flexbox, classes).
+*/
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  text-align: center;
+  background-color: #121213;
+  color: #ffffff;
+  padding: 20px;
+}
+
+.back-link {
+  color: #818384;
+  text-decoration: none;
+}
+
+.subtitle {
+  color: #818384;
+}
+
+#task-form {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin: 20px auto;
+  max-width: 400px;
+}
+
+#task-input {
+  flex: 1; /* let the text box grow to fill the available space */
+  padding: 10px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 4px;
+}
+
+#task-form button {
+  padding: 10px 16px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 4px;
+  background-color: #538d4e;
+  color: white;
+  cursor: pointer;
+}
+
+#task-count {
+  color: #818384;
+}
+
+/* The list itself: remove the default bullet points and padding. */
+#task-list {
+  list-style: none;
+  padding: 0;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+/* Each individual task row. */
+.task-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background-color: #1e1e1f;
+  border: 1px solid #3a3a3c;
+  border-radius: 4px;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  text-align: left;
+}
+
+/* The task text takes up the remaining space, same trick as the input above. */
+.task-text {
+  flex: 1;
+}
+
+/*
+  This class gets added/removed by JavaScript when a task is
+  checked off. It's the same pattern as the .correct/.present/
+  .absent classes in Wordle: JS just toggles a class, CSS defines
+  what that class looks like.
+*/
+.task-text.completed {
+  text-decoration: line-through;
+  color: #818384;
+}
+
+.delete-btn {
+  background: none;
+  border: none;
+  color: #b13636;
+  font-size: 1.1rem;
+  cursor: pointer;
+}

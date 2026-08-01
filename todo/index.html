@@ -1,0 +1,54 @@
+<!--
+  TO-DO LIST - project #2 in our "learn to code" series.
+
+  Wordle taught you: variables, functions, loops, arrays, the DOM,
+  and event listeners. This project reuses ALL of that, and adds one
+  big new idea: managing a list of DATA (not just letters) and
+  keeping the on-screen list in sync with it every time it changes.
+
+  Structure is the same three-file pattern as Wordle:
+    index.html -> structure (this file)
+    style.css  -> looks
+    script.js  -> behavior
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>To-Do List - Learn to Code</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <a href="../index.html" class="back-link">&larr; Back to home</a>
+
+  <h1>To-Do List</h1>
+  <p class="subtitle">Project 2: managing a list of data</p>
+
+  <!--
+    A <form> groups the text input and button together and lets us
+    submit by pressing Enter, not just by clicking - the browser
+    gives us that for free when we use a real <form>.
+  -->
+  <form id="task-form">
+    <input
+      id="task-input"
+      type="text"
+      placeholder="What do you need to do?"
+      autocomplete="off"
+    />
+    <button type="submit">Add</button>
+  </form>
+
+  <p id="task-count"></p>
+
+  <!--
+    This <ul> (unordered list) starts empty. Just like the Wordle
+    grid, our JavaScript builds every <li> inside it from data,
+    instead of us typing each task by hand.
+  -->
+  <ul id="task-list"></ul>
+
+  <script src="script.js"></script>
+</body>
+</html>
