@@ -1,0 +1,142 @@
+/*
+  CSS = Cascading Style Sheets. It controls how HTML elements look.
+
+  The basic pattern is always:
+
+    selector {
+      property: value;
+    }
+
+  A "selector" picks which HTML element(s) to style.
+    - a tag name like `body` selects every <body> element
+    - a dot like `.tile` selects every element with class="tile"
+    - a hash like `#board` selects the ONE element with id="board"
+*/
+
+/* `body` selects the whole page. */
+body {
+  /* font-family controls what typeface the text uses. */
+  font-family: Arial, Helvetica, sans-serif;
+
+  /* text-align centers our text horizontally. */
+  text-align: center;
+
+  /* This sets the page background and text colors. */
+  background-color: #121213;
+  color: #ffffff;
+
+  /* Adds some breathing room around the edge of the page. */
+  padding: 20px;
+}
+
+.back-link {
+  color: #818384;
+  text-decoration: none;
+}
+
+.subtitle {
+  color: #818384;
+}
+
+/*
+  #board is our tile grid container.
+  "display: grid" turns this element into a CSS Grid - a powerful
+  layout tool for arranging things in rows and columns.
+*/
+#board {
+  /* This creates 5 equal-width columns, one per letter. */
+  grid-template-columns: repeat(5, 60px);
+
+  /* This is how CSS Grid knows to actually use grid layout. */
+  display: grid;
+
+  /* Space between each tile. */
+  gap: 6px;
+
+  /* Center the grid on the page. */
+  justify-content: center;
+  margin: 20px auto;
+}
+
+/* .tile styles EVERY letter box in the grid. */
+.tile {
+  width: 60px;
+  height: 60px;
+
+  /* Flexbox is another layout tool - great for centering ONE thing. */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 2px solid #3a3a3c;
+  font-size: 2rem;
+  font-weight: bold;
+  text-transform: uppercase;
+
+  /* `transition` makes color changes fade smoothly instead of snapping. */
+  transition: background-color 0.3s ease;
+}
+
+/*
+  These three classes get ADDED to a tile with JavaScript once we know
+  if a letter is correct, present (wrong spot), or absent.
+  Notice how the same .tile rules above still apply - these just add
+  a background color on top.
+*/
+.tile.correct {
+  background-color: #538d4e; /* green */
+  border-color: #538d4e;
+}
+
+.tile.present {
+  background-color: #b59f3b; /* yellow */
+  border-color: #b59f3b;
+}
+
+.tile.absent {
+  background-color: #3a3a3c; /* dark gray */
+  border-color: #3a3a3c;
+}
+
+#message {
+  min-height: 1.5rem;
+  font-weight: bold;
+}
+
+/* #keyboard holds rows of buttons. */
+#keyboard {
+  max-width: 500px;
+  margin: 20px auto;
+}
+
+.keyboard-row {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.key {
+  min-width: 30px;
+  padding: 12px 8px;
+  border: none;
+  border-radius: 4px;
+  background-color: #818384;
+  color: white;
+  font-weight: bold;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+/* Same idea as the tile colors above, reused for the keyboard keys. */
+.key.correct {
+  background-color: #538d4e;
+}
+
+.key.present {
+  background-color: #b59f3b;
+}
+
+.key.absent {
+  background-color: #3a3a3c;
+}

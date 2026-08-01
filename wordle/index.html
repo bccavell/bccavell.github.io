@@ -1,0 +1,54 @@
+<!--
+  WORDLE - a beginner-friendly coding tutorial disguised as a game!
+
+  This file is HTML. HTML describes the STRUCTURE of a web page - like the
+  skeleton of a body. Every piece of content on the page (headings, boxes,
+  buttons) is wrapped in a "tag", written like <tagname>content</tagname>.
+
+  There are two other files that work together with this one:
+    - style.css   -> controls how things LOOK (colors, spacing, layout)
+    - script.js   -> controls how things BEHAVE (the game logic)
+
+  This split (structure / style / behavior) is a classic web dev pattern.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Wordle - Learn to Code</title>
+
+  <!-- This line connects our CSS file to this HTML page. -->
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <a href="../index.html" class="back-link">&larr; Back to home</a>
+
+  <h1>Wordle</h1>
+  <p class="subtitle">Guess the 5-letter word in 6 tries!</p>
+
+  <!--
+    This <div> will hold our grid of letter tiles.
+    It's empty right now - our JavaScript code will fill it in
+    automatically when the page loads. Building HTML with code
+    (instead of typing it all by hand) is a super common technique.
+  -->
+  <div id="board"></div>
+
+  <!-- This shows messages to the player, like "You win!" or "Not a valid word". -->
+  <p id="message"></p>
+
+  <!--
+    This is our on-screen keyboard. Clicking these buttons does the same
+    thing as pressing the real keys on your keyboard.
+  -->
+  <div id="keyboard"></div>
+
+  <!--
+    This line loads our JavaScript file. We put <script> at the bottom
+    of <body> so the browser reads and builds all the HTML above it
+    FIRST, before running any code that tries to find and use it.
+  -->
+  <script src="script.js"></script>
+</body>
+</html>
