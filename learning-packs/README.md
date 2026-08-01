@@ -35,3 +35,6 @@ actually new each time).
 - Event delegation (one listener for many dynamic elements)
 - Array methods: `.filter()` and `.map()`
 - Forms and `event.preventDefault()`
+- Responsive/mobile-friendly design (viewport meta tag, `box-sizing`,
+  touch target sizing, Grid `fr` units, `aspect-ratio`, `clamp()`,
+  proportional Flexbox sizing)
