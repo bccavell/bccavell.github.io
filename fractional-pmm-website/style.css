@@ -1,11 +1,12 @@
 /*
   AI PMM ENGINE - styles.
 
-  This project deliberately looks different from Wordle/To-Do's dark
-  "game" theme - it's a B2B marketing site, so it uses a clean, light,
-  professional look instead. Same underlying CSS skills though: box
-  model, selectors, Flexbox, Grid - plus a couple of new ideas
-  explained inline below.
+  A dark, "techy" theme - dark background, a violet/cyan accent pair,
+  and some gradient/glow touches, to signal "AI-native" and give the
+  page a bit more visual energy than a flat light theme. Same
+  underlying CSS skills as before (box model, selectors, Flexbox,
+  Grid) - plus a few new ideas explained inline below, mostly around
+  gradients and hover effects.
 */
 
 /* Same border-box reset as every other project - see todo/style.css
@@ -32,13 +33,15 @@
      product's) are built under the hood.
 */
 :root {
-  --color-ink: #14171f;       /* main text color - near-black, not pure black (softer on the eyes) */
-  --color-muted: #5b6270;     /* secondary/supporting text */
-  --color-bg: #ffffff;        /* page background */
-  --color-bg-alt: #f5f6f8;    /* alternate section background, for visual rhythm */
-  --color-accent: #2f6fed;    /* primary accent - buttons, links, highlights */
-  --color-accent-ink: #ffffff;/* text color placed ON TOP of the accent color */
-  --color-border: #e2e4e9;
+  --color-ink: #f2f3f7;         /* main text color - off-white, not pure white (softer on a dark bg) */
+  --color-muted: #98a0b3;       /* secondary/supporting text */
+  --color-bg: #0a0b10;          /* page background - near-black with a hint of blue */
+  --color-bg-alt: #10121b;      /* alternate section background, slightly lighter, for visual rhythm */
+  --color-surface: #14161f;     /* card/panel background - sits one step above the page background */
+  --color-accent: #7c5cff;      /* primary accent - violet */
+  --color-accent-2: #22d3ee;    /* secondary accent - cyan, paired with violet for gradients/glow */
+  --color-accent-ink: #ffffff;  /* text color placed ON TOP of the accent color */
+  --color-border: rgba(255, 255, 255, 0.08);
 
   --max-width: 880px;
   --radius: 10px;
@@ -51,12 +54,40 @@ body {
   line-height: 1.6;
 
   /*
+    A faint dot grid, drawn with CSS instead of an image file.
+    `radial-gradient(color 1px, transparent 1px)` paints one tiny dot;
+    `background-size: 24px 24px` repeats that dot every 24 pixels in
+    both directions, tiling it into a grid. The dots are barely-there
+    white at 4% opacity, so it reads as texture, not decoration -
+    the same subtle "dev tool" background you'll see on sites like
+    Vercel's or Linear's.
+  */
+  background-image: radial-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+  background-size: 24px 24px;
+
+  /*
     `scroll-behavior: smooth` makes clicking a nav link (like
     `<a href="#pricing">`) glide down to that section instead of
     jumping instantly. It's a one-line CSS feature - no JavaScript
     needed for this part.
   */
   scroll-behavior: smooth;
+}
+
+/*
+  NEW CONCEPT: gradient text.
+  `background-clip: text` normally clips a background IMAGE to the
+  shape of an element's box. Set it on text with `color: transparent`,
+  and the "shape" being clipped to is the letters themselves - so the
+  gradient shows through only where the text is. `-webkit-` prefixed
+  versions are included because this feature shipped in Safari/Chrome
+  before it became a standard property.
+*/
+.accent-text {
+  background-image: linear-gradient(135deg, var(--color-accent), var(--color-accent-2));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
 /*
@@ -85,7 +116,7 @@ body {
   position: sticky;
   top: 0;
   z-index: 10; /* keeps the header drawn on top of page content, not behind it */
-  background-color: rgba(255, 255, 255, 0.9);
+  background-color: rgba(10, 11, 16, 0.75);
   backdrop-filter: blur(6px); /* subtle frosted-glass effect behind the header */
   border-bottom: 1px solid var(--color-border);
 }
@@ -104,6 +135,19 @@ body {
   font-size: 1.1rem;
   color: var(--color-ink);
   text-decoration: none;
+}
+
+/*
+  Both `.logo` and `.accent-text` set a `color`, and they're both
+  single-class selectors - so normally whichever rule comes LATER in
+  the file wins a tie. `.logo` happens to come after `.accent-text`
+  above, which would silently cancel the gradient-text effect on the
+  logo specifically. Targeting `.logo.accent-text` (both classes on
+  one selector) has higher specificity than either alone, so this
+  rule wins regardless of file order.
+*/
+.logo.accent-text {
+  color: transparent;
 }
 
 .site-nav {
@@ -159,17 +203,42 @@ body {
   font-size: 0.95rem;
   /* 44px-ish minimum tap target height, same reasoning as the
      to-do app's delete button - easy to tap accurately on a phone. */
+
+  /*
+    `transition` tells the browser "when one of these properties
+    changes, animate it over 0.15s instead of snapping instantly."
+    Paired with the `:hover` rules below, this is what makes the
+    buttons/cards feel like they respond to your cursor instead of
+    just switching states abruptly.
+  */
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
 }
 
 .btn-primary {
-  background-color: var(--color-accent);
+  /* A diagonal gradient between the two accent colors, instead of a
+     flat fill - plus a soft "glow" shadow in the accent color, which
+     reads as a light source behind the button rather than a hard
+     drop shadow. */
+  background-image: linear-gradient(135deg, var(--color-accent), var(--color-accent-2));
   color: var(--color-accent-ink);
+  box-shadow: 0 0 24px rgba(124, 92, 255, 0.35);
+  border: 1px solid transparent;
+}
+
+.btn-primary:hover {
+  transform: translateY(-1px); /* a tiny lift on hover - just enough to feel interactive */
+  box-shadow: 0 0 32px rgba(124, 92, 255, 0.5);
 }
 
 .btn-secondary {
   background-color: transparent;
   color: var(--color-ink);
   border: 1px solid var(--color-border);
+}
+
+.btn-secondary:hover {
+  border-color: var(--color-accent);
+  transform: translateY(-1px);
 }
 
 .hero-actions {
@@ -220,6 +289,19 @@ body {
 .hero {
   padding: 96px 0 72px;
   text-align: left;
+
+  /*
+    Two soft, oversized radial gradients layered as a background
+    "image" behind the section, on top of the solid --color-bg.
+    Each one fades from a translucent accent color to fully
+    transparent, positioned off in a corner - the effect reads as a
+    soft glow of light coming from behind the content, a common touch
+    on dark "AI product" marketing pages (Vercel, Linear, Raycast all
+    use some version of this).
+  */
+  background-image:
+    radial-gradient(600px circle at 15% -10%, rgba(124, 92, 255, 0.25), transparent 60%),
+    radial-gradient(500px circle at 90% 10%, rgba(34, 211, 238, 0.18), transparent 60%);
 }
 
 .hero h1 {
@@ -253,10 +335,16 @@ body {
 }
 
 .timeline-card {
-  background-color: var(--color-bg);
+  background-color: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius);
   padding: 24px;
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+
+.timeline-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--color-accent);
 }
 
 .timeline-week {
@@ -291,12 +379,17 @@ body {
 .credibility-list li {
   color: var(--color-muted);
   max-width: 65ch;
+  /* A thin accent-colored bar down the left edge - a small way to
+     echo the accent color again without adding another whole card. */
+  border-left: 2px solid var(--color-accent);
+  padding-left: 16px;
 }
 
 /* ===== CASE STUDY PLACEHOLDER ===== */
 
 .placeholder-box {
   border: 1px dashed var(--color-border);
+  background-color: var(--color-surface);
   border-radius: var(--radius);
   padding: 40px 24px;
   text-align: center;
@@ -316,15 +409,23 @@ body {
 }
 
 .pricing-card {
-  background-color: var(--color-bg);
+  background-color: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius);
   padding: 28px;
+  transition: transform 0.15s ease;
+}
+
+.pricing-card:hover {
+  transform: translateY(-2px);
 }
 
 .pricing-card-primary {
   border-color: var(--color-accent);
   border-width: 2px;
+  /* A permanent (not just on-hover) glow, since this is the
+     recommended option and should stand out at a glance. */
+  box-shadow: 0 0 32px rgba(124, 92, 255, 0.2);
 }
 
 .pricing-card h3 {
@@ -362,7 +463,7 @@ body {
 
 .pricing-card li::before {
   content: "\2713  "; /* a checkmark character, drawn before each list item via CSS instead of typing it in the HTML every time */
-  color: var(--color-accent);
+  color: var(--color-accent-2);
 }
 
 /* ===== CONTACT ===== */

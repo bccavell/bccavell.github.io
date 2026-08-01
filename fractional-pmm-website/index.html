@@ -44,6 +44,17 @@
   -->
   <meta name="robots" content="noindex, nofollow" />
 
+  <!--
+    NEW CONCEPT: theme-color.
+    On mobile browsers (Safari/Chrome on Android), this tints the
+    browser's own UI - the address bar area - to match a color you
+    choose, instead of leaving it the browser's default white/grey.
+    It's a small touch, but it's what makes a dark site feel dark
+    all the way to the edges of the screen on a phone, not just
+    inside the page content.
+  -->
+  <meta name="theme-color" content="#0a0b10" />
+
   <title>AI PMM Engine</title>
   <link rel="stylesheet" href="style.css" />
 </head>
@@ -66,7 +77,7 @@
   -->
   <header class="site-header">
     <div class="header-inner">
-      <a href="#hero" class="logo">AI PMM Engine</a>
+      <a href="#hero" class="logo accent-text">AI PMM Engine</a>
 
       <!--
         The hamburger button only shows up on narrow screens (see
@@ -95,7 +106,7 @@
     <!-- ===== HERO ===== -->
     <section id="hero" class="hero">
       <div class="section-inner">
-        <h1>Product marketing that keeps working after I leave.</h1>
+        <h1>Product marketing that <span class="accent-text">keeps working</span> after I leave.</h1>
         <p class="hero-subhead">
           Fractional PMM for early-stage B2B/SaaS founders. Messaging built
           from real customer conversations - delivered as a system your
