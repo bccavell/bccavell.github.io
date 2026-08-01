@@ -15,6 +15,14 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <!--
+    The viewport meta tag tells mobile browsers "render this page at
+    the phone's actual screen width, not a shrunk-down desktop view."
+    Without it, phones assume every site is built for ~980px wide
+    desktops and zoom the whole page out to fit - which is exactly
+    why this page looked broken on your phone.
+  -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>To-Do List - Learn to Code</title>
   <link rel="stylesheet" href="style.css" />
 </head>

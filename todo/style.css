@@ -1,8 +1,21 @@
 /*
   Same dark theme as the Wordle page, so the site feels consistent.
   Nothing new to learn in this file - it reuses ideas from
-  wordle/style.css (selectors, flexbox, classes).
+  wordle/style.css (selectors, flexbox, classes) - plus a few
+  additions at the bottom for making things work well on phones.
 */
+
+/*
+  `*` selects EVERY element on the page. box-sizing: border-box
+  changes how width is calculated: normally, padding and border get
+  ADDED on top of an element's width, which can make things overflow
+  their container in surprising ways (especially on narrow phone
+  screens). border-box makes padding/border count INSIDE the width
+  you set instead, which is far more predictable.
+*/
+* {
+  box-sizing: border-box;
+}
 
 body {
   font-family: Arial, Helvetica, sans-serif;
@@ -27,11 +40,19 @@ body {
   gap: 8px;
   margin: 20px auto;
   max-width: 400px;
+  /* max-width caps the size on big screens, but doesn't force it -
+     on a narrow phone, the form just shrinks to fit instead. That's
+     why this layout didn't actually need a media query to resize. */
 }
 
 #task-input {
   flex: 1; /* let the text box grow to fill the available space */
+  min-width: 0; /* lets a flex item shrink below its content size, */
+  /* otherwise long text could stop it from shrinking on tiny screens */
   padding: 10px;
+  /* 16px (1rem) is important here, not just for readability - iOS
+     Safari auto-zooms the whole page when you tap an input with a
+     font-size BELOW 16px, which feels broken on a phone. */
   font-size: 1rem;
   border: none;
   border-radius: 4px;
@@ -93,5 +114,23 @@ body {
   border: none;
   color: #b13636;
   font-size: 1.1rem;
+  cursor: pointer;
+  /*
+    Apple and Google's own accessibility guidelines recommend touch
+    targets be at least 44x44px, since fingers are far less precise
+    than a mouse cursor. The button's ✕ character alone is much
+    smaller than that, so we pad it out to make it easy to tap.
+  */
+  padding: 10px;
+  min-width: 44px;
+  min-height: 44px;
+}
+
+/* Native checkboxes render tiny by default - scale this one up so
+   it's easier to tap accurately on a touchscreen. */
+.toggle-checkbox {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0; /* don't let it get squeezed by the text next to it */
   cursor: pointer;
 }
