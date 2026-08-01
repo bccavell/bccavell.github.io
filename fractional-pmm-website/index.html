@@ -1,0 +1,316 @@
+<!--
+  AI PMM ENGINE - stealth-mode marketing site for a fractional Product
+  Marketing consulting side hustle.
+
+  This is project #4 in the "learn to code" series, but unlike Wordle/
+  To-Do/etc it's NOT framed as a learning demo in the visible copy - it
+  needs to read as a real, professional business site, because the plan
+  is to actually send this link to warm leads. The teaching happens in
+  these comments instead, for whoever's reading the code later.
+
+  IMPORTANT - this page is deliberately kept OUT of the site's public
+  nav (../index.html doesn't link here). It's reachable only if someone
+  has the direct URL. We also add a "noindex" meta tag below, which
+  politely asks Google not to list this page in search results.
+  Neither of those makes the page truly private - GitHub Pages serves
+  it to anyone with the link - but together they keep it out of casual
+  discovery, which is what a "send-to-warm-leads-only" site needs.
+
+  Structure is the same three-file pattern as every other project here:
+    index.html -> structure (this file)
+    style.css  -> looks
+    script.js  -> behavior (just a mobile nav toggle here)
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+
+  <!--
+    Same viewport tag as the other projects - tells phones to render
+    at their actual screen width instead of zooming out a desktop
+    layout. See learning-packs/todo.md if you want the full "why."
+  -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!--
+    NEW CONCEPT: the robots meta tag.
+    Search engines like Google send automated crawlers around the web
+    that read pages and decide whether to list them in search results.
+    "noindex" tells a well-behaved crawler "don't list this page."
+    "nofollow" tells it "don't follow links found on this page either."
+    This only works on crawlers that choose to respect it (Google
+    does) - it's a polite request, not a lock on the door.
+  -->
+  <meta name="robots" content="noindex, nofollow" />
+
+  <title>AI PMM Engine</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!--
+    Semantic HTML5 landmark elements - NEW CONCEPT for this project.
+    Every other page in this repo used plain <div>s for layout. Here
+    we use tags that describe WHAT a section of the page IS, not just
+    how it's positioned: <header> (top banner), <nav> (navigation
+    links), <main> (the actual page content), <section> (a distinct
+    chunk of content within main), and <footer> (bottom banner).
+
+    Why bother? Two reasons:
+    1. Screen readers (used by blind/low-vision visitors) announce
+       these landmarks, so someone can jump straight to "navigation"
+       or "main content" instead of listening to the whole page.
+    2. It's just more readable code - future-you can scan the tag
+       names and know the page's skeleton without reading every line.
+  -->
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="#hero" class="logo">AI PMM Engine</a>
+
+      <!--
+        The hamburger button only shows up on narrow screens (see
+        style.css). It toggles the nav menu open/closed on mobile -
+        script.js listens for clicks on this button.
+      -->
+      <button id="nav-toggle" class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+      <nav id="site-nav" class="site-nav">
+        <a href="#problem">Problem</a>
+        <a href="#offer">The Sprint</a>
+        <a href="#differentiator">Why It's Different</a>
+        <a href="#credibility">Background</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#contact" class="nav-cta">Get in touch</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- ===== HERO ===== -->
+    <section id="hero" class="hero">
+      <div class="section-inner">
+        <h1>Product marketing that keeps working after I leave.</h1>
+        <p class="hero-subhead">
+          Fractional PMM for early-stage B2B/SaaS founders. Messaging built
+          from real customer conversations - delivered as a system your
+          team can keep running, not another deck that goes stale in a
+          shared drive.
+        </p>
+        <div class="hero-actions">
+          <a href="#contact" class="btn btn-primary">Get in touch</a>
+          <a href="#offer" class="btn btn-secondary">See how it works</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== THE PROBLEM ===== -->
+    <section id="problem" class="section">
+      <div class="section-inner">
+        <h2>Technical founders can build the product. Explaining it clearly is a different skill.</h2>
+        <p>
+          You know exactly why your product matters - you just built it.
+          But translating that into a message a buyer immediately gets is
+          a different craft, and it's easy to burn weeks second-guessing
+          the homepage copy instead of shipping.
+        </p>
+        <p>
+          Hiring a full-time PMM this early is a big bet. Hiring a
+          consultant usually means a deck and a Google Doc land in your
+          inbox, everyone nods, and six months later the product has moved
+          on but the messaging hasn't - because the person who wrote it is
+          gone and nobody else knows how to update it.
+        </p>
+      </div>
+    </section>
+
+    <!-- ===== THE OFFER ===== -->
+    <section id="offer" class="section section-alt">
+      <div class="section-inner">
+        <h2>The Sprint</h2>
+        <p class="section-lede">Three weeks. One clear deliverable: messaging your team can actually run with.</p>
+
+        <!--
+          NEW CONCEPT: CSS Grid with `repeat(auto-fit, minmax(...))`.
+          You've used Grid before (Wordle's letter grid, To-do's mobile
+          layout), but always with a fixed number of columns. This
+          pattern instead says "fit as many columns as you can, but
+          never let one shrink below this width" - so the grid
+          reflows from 3 columns on desktop down to 1 on a phone
+          automatically, with no media query needed. See style.css
+          for exactly how.
+        -->
+        <div class="timeline-grid">
+          <div class="timeline-card">
+            <span class="timeline-week">Week 1</span>
+            <h3>Buyer persona &amp; VoC synthesis</h3>
+            <p>
+              Built from real customer interviews - not invented personas.
+              We talk to your actual users and pull out the language they
+              use to describe the problem you solve.
+            </p>
+          </div>
+          <div class="timeline-card">
+            <span class="timeline-week">Week 2</span>
+            <h3>Core messaging matrix</h3>
+            <p>
+              Your value proposition, messaging pillars, and a
+              feature-to-benefit translation your whole team can use
+              consistently - in sales calls, on the site, in decks.
+            </p>
+          </div>
+          <div class="timeline-card">
+            <span class="timeline-week">Week 3</span>
+            <h3>Copywriting sandbox</h3>
+            <p>
+              Homepage copy and sales one-liners, drafted and refined with
+              you, ready to ship.
+            </p>
+          </div>
+        </div>
+
+        <p class="offer-note">
+          Delivered as strategy documents <strong>and</strong> a configured
+          system your team keeps using after the engagement ends - more on
+          that below.
+        </p>
+      </div>
+    </section>
+
+    <!-- ===== THE DIFFERENTIATOR ===== -->
+    <section id="differentiator" class="section">
+      <div class="section-inner">
+        <h2>The IP lives in your workspace, not mine.</h2>
+        <p>
+          Most consultants hand over a static deck. It's accurate on the
+          day it's delivered, then slowly goes stale as your product
+          changes and nobody updates it.
+        </p>
+        <p>
+          Instead, the messaging strategy gets built into a Claude Skill
+          configured inside <strong>your own</strong> Claude workspace -
+          not mine. Your team can keep asking it questions, generating new
+          copy in your voice, and adapting the messaging as the product
+          evolves, long after the engagement wraps. You own the account.
+          You own the IP. Nothing walks out the door with the consultant.
+        </p>
+        <p>
+          The AI system is the delivery mechanism, not the pitch. The
+          actual work - talking to your customers, finding the real
+          insight, deciding what to say and what to leave out - is done by
+          me, the same way any good PMM does it. The system just means it
+          doesn't stop working the day the invoice is paid.
+        </p>
+      </div>
+    </section>
+
+    <!-- ===== CREDIBILITY ===== -->
+    <section id="credibility" class="section section-alt">
+      <div class="section-inner">
+        <h2>Background</h2>
+        <p>
+          In-house product marketing experience at:
+        </p>
+        <ul class="credibility-list">
+          <li>
+            <strong>TryHackMe</strong> - a cybersecurity training platform
+            with a large global user base, where messaging had to work for
+            both individual learners and enterprise security teams at the
+            same time.
+          </li>
+          <li>
+            <strong>Multiverse</strong> - an EdTech unicorn, where product
+            marketing had to keep pace with a fast-moving B2B sales motion
+            and a product that shipped constantly.
+          </li>
+        </ul>
+        <p>
+          This isn't a side-project consultancy - it's the same craft,
+          applied fractionally, for founders who need it before they can
+          justify a full-time hire.
+        </p>
+      </div>
+    </section>
+
+    <!-- ===== CASE STUDY / SOCIAL PROOF ===== -->
+    <section id="work" class="section">
+      <div class="section-inner">
+        <h2>Case studies</h2>
+        <!--
+          Deliberately empty until there's a real pilot client. No fake
+          logos, no invented quotes - the brief was explicit about this,
+          and it's also just the right call: a fake testimonial is the
+          fastest way to lose trust with a technical, skeptical buyer.
+        -->
+        <div class="placeholder-box">
+          <p>First pilot case study coming soon.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== PRICING ===== -->
+    <section id="pricing" class="section section-alt">
+      <div class="section-inner">
+        <h2>Pricing</h2>
+        <div class="pricing-grid">
+          <div class="pricing-card pricing-card-primary">
+            <h3>The Sprint</h3>
+            <p class="price">&pound;1,500</p>
+            <p class="price-note">3-week engagement, one-time</p>
+            <ul>
+              <li>Buyer persona &amp; VoC synthesis</li>
+              <li>Core messaging matrix</li>
+              <li>Copywriting sandbox</li>
+              <li>A living system your team keeps</li>
+            </ul>
+            <a href="#contact" class="btn btn-primary">Get in touch</a>
+          </div>
+          <div class="pricing-card">
+            <h3>The Retainer</h3>
+            <p class="price">&pound;750<span class="price-period">/mo</span></p>
+            <p class="price-note">Optional add-on, after the Sprint</p>
+            <ul>
+              <li>Light-touch system maintenance</li>
+              <li>Ongoing messaging optimization</li>
+            </ul>
+            <a href="#contact" class="btn btn-secondary">Ask about this</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== CONTACT / CTA ===== -->
+    <section id="contact" class="section contact-section">
+      <div class="section-inner">
+        <h2>Let's have a 15-minute conversation.</h2>
+        <p>No pitch deck, no pressure - just a quick call to see if this is a fit.</p>
+
+        <!--
+          TODO (Billy): both of these are placeholders until you decide
+          on a dedicated business email and Calendly link. Swap them in
+          here, and this whole section just starts working - nothing
+          else on the page needs to change.
+        -->
+        <div class="hero-actions">
+          <a href="mailto:REPLACE-WITH-YOUR-BUSINESS-EMAIL@example.com" class="btn btn-primary">Email me</a>
+          <a href="#" class="btn btn-secondary">Book a call (Calendly link TBD)</a>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="section-inner">
+      <p>AI PMM Engine</p>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
