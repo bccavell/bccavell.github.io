@@ -13,6 +13,16 @@
     - a hash like `#board` selects the ONE element with id="board"
 */
 
+/*
+  `*` selects EVERY element. box-sizing: border-box makes padding
+  and borders count INSIDE an element's width instead of adding on
+  top of it - it prevents surprising overflow on narrow screens.
+  (Same fix we used in todo/style.css.)
+*/
+* {
+  box-sizing: border-box;
+}
+
 /* `body` selects the whole page. */
 body {
   /* font-family controls what typeface the text uses. */
@@ -44,8 +54,14 @@ body {
   layout tool for arranging things in rows and columns.
 */
 #board {
-  /* This creates 5 equal-width columns, one per letter. */
-  grid-template-columns: repeat(5, 60px);
+  /*
+    "1fr" means "1 fraction of the available space." repeat(5, 1fr)
+    splits #board's width into 5 EQUAL columns, whatever that width
+    happens to be - unlike a fixed 60px, this can never overflow a
+    narrow phone screen, because the columns always add up to
+    exactly 100% of the container.
+  */
+  grid-template-columns: repeat(5, 1fr);
 
   /* This is how CSS Grid knows to actually use grid layout. */
   display: grid;
@@ -53,15 +69,23 @@ body {
   /* Space between each tile. */
   gap: 6px;
 
+  /* Cap how big the board gets on large screens, but let it shrink
+     to fit smaller ones (width: 100% of whatever space it has). */
+  max-width: 330px;
+  width: 100%;
+
   /* Center the grid on the page. */
-  justify-content: center;
   margin: 20px auto;
 }
 
 /* .tile styles EVERY letter box in the grid. */
 .tile {
-  width: 60px;
-  height: 60px;
+  /* Fill whatever width the grid gives this column... */
+  width: 100%;
+  /* ...and aspect-ratio: 1/1 keeps the tile perfectly square no
+     matter how wide or narrow that turns out to be, instead of us
+     having to calculate a matching height by hand. */
+  aspect-ratio: 1 / 1;
 
   /* Flexbox is another layout tool - great for centering ONE thing. */
   display: flex;
@@ -69,7 +93,11 @@ body {
   justify-content: center;
 
   border: 2px solid #3a3a3c;
-  font-size: 2rem;
+  /* clamp(min, preferred, max) picks a font size that scales with
+     the viewport width (vw) but never goes below/above these limits -
+     so letters shrink gracefully on small phones instead of forcing
+     the tiles to overflow to stay legible. */
+  font-size: clamp(1.25rem, 6vw, 2rem);
   font-weight: bold;
   text-transform: uppercase;
 
@@ -106,6 +134,7 @@ body {
 /* #keyboard holds rows of buttons. */
 #keyboard {
   max-width: 500px;
+  width: 100%;
   margin: 20px auto;
 }
 
@@ -117,15 +146,32 @@ body {
 }
 
 .key {
-  min-width: 30px;
-  padding: 12px 8px;
+  /*
+    flex: 1 tells every key "grow and shrink to take an equal share
+    of the row's width." Since the shares always add up to the row's
+    actual width, this row can NEVER overflow its container, on any
+    screen size - the keys just get proportionally narrower on a
+    small phone instead of spilling off the edge.
+  */
+  flex: 1;
+  min-width: 0; /* lets a flex item shrink below its content size */
+
+  padding: 12px 4px;
   border: none;
   border-radius: 4px;
   background-color: #818384;
   color: white;
   font-weight: bold;
   text-transform: uppercase;
+  font-size: clamp(0.7rem, 3vw, 1rem);
   cursor: pointer;
+}
+
+/* Enter and Backspace show longer labels, so give them a bit more
+   room than a single letter key by growing more (1.5 shares vs 1). */
+#key-enter,
+#key-backspace {
+  flex: 1.5;
 }
 
 /* Same idea as the tile colors above, reused for the keyboard keys. */
