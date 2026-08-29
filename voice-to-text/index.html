@@ -1,0 +1,62 @@
+<!--
+  VOICE TO TEXT - project #4 in our "learn to code" series.
+
+  Same three-file pattern as every other project here:
+    index.html -> structure (this file)
+    style.css  -> looks
+    script.js  -> behavior
+
+  The big new idea this time: talking to a BROWSER API instead of
+  just the DOM. The Web Speech API lets JavaScript ask the browser
+  itself to listen to your microphone and turn speech into text -
+  no external service, no account, no install. That's what makes
+  this "lightweight": it's just a webpage.
+
+  Works in Safari and Chrome on macOS. It does NOT work in Firefox,
+  since Firefox hasn't implemented this API - script.js checks for
+  that and shows a friendly message instead of silently failing.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <!-- Same viewport tag as the other projects - makes this usable on
+       your phone too, not just the Mac. -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Voice to Text - Learn to Code</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <a href="../index.html" class="back-link">&larr; Back to home</a>
+
+  <h1>Voice to Text</h1>
+  <p class="subtitle">Project 4: talking to a browser API</p>
+
+  <!-- This paragraph is where we'll show what's going on: "Click to
+       start", "Listening...", or an error message. JS updates its
+       text - we never hand-write it here. -->
+  <p id="status">Click the button and start talking.</p>
+
+  <!-- type="button" (not "submit") because there's no <form> here -
+       we don't want any default browser behavior, just our own
+       click handling in script.js. -->
+  <button id="mic-button" type="button">🎤 Start Listening</button>
+
+  <!-- A <textarea> instead of a <p> for the transcript, on purpose:
+       it's editable, so you can clean up a word the microphone
+       misheard before copying or downloading the text. -->
+  <textarea
+    id="transcript"
+    placeholder="Your words will appear here as you speak..."
+  ></textarea>
+
+  <div class="actions">
+    <button id="copy-button" type="button">📋 Copy</button>
+    <button id="download-button" type="button">⬇ Download .txt</button>
+    <button id="clear-button" type="button">🗑 Clear</button>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

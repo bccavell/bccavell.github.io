@@ -1,0 +1,111 @@
+/*
+  Same dark theme as every other project on the site, so it all
+  feels like one place. Nothing new to learn in the color choices -
+  see todo/style.css or wordle/style.css for where these ideas were
+  first introduced. What IS new here is the ::placeholder selector
+  and the @keyframes animation near the bottom, for the "listening"
+  pulse on the mic button.
+*/
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  text-align: center;
+  background-color: #121213;
+  color: #ffffff;
+  padding: 20px;
+}
+
+.back-link {
+  color: #818384;
+  text-decoration: none;
+}
+
+.subtitle {
+  color: #818384;
+}
+
+#status {
+  color: #818384;
+  min-height: 1.2em; /* stops the page from "jumping" when this text changes length */
+}
+
+#mic-button {
+  padding: 14px 24px;
+  font-size: 1.1rem;
+  border: none;
+  border-radius: 8px;
+  background-color: #538d4e;
+  color: white;
+  cursor: pointer;
+  margin-bottom: 16px;
+}
+
+/*
+  This class gets added by script.js while the microphone is
+  actively listening, and removed when it stops - the same
+  "JS toggles a class, CSS defines what it looks like" pattern as
+  Wordle's .correct/.present/.absent tiles.
+*/
+#mic-button.listening {
+  background-color: #b13636;
+  /* `animation` runs the @keyframes rule defined below, forever
+     (infinite), so the button gently pulses while it's recording -
+     a visual cue that the mic is live, without needing to read text. */
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(177, 54, 54, 0.6); }
+  70% { box-shadow: 0 0 0 14px rgba(177, 54, 54, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(177, 54, 54, 0); }
+}
+
+#transcript {
+  display: block;
+  width: 100%;
+  max-width: 600px;
+  height: 220px;
+  margin: 0 auto 16px auto;
+  padding: 12px;
+  /* 16px minimum, same reason as the to-do list's text input: iOS
+     Safari auto-zooms the page on any input/textarea with smaller
+     text, which feels broken on a phone. */
+  font-size: 1rem;
+  font-family: inherit;
+  background-color: #1e1e1f;
+  color: #ffffff;
+  border: 1px solid #3a3a3c;
+  border-radius: 8px;
+  resize: vertical; /* lets you drag the bottom-right corner to make it taller */
+}
+
+/* ::placeholder styles the greyed-out hint text before you type -
+   without this rule it would default to a color that's hard to
+   read against our dark background. */
+#transcript::placeholder {
+  color: #818384;
+}
+
+.actions {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap; /* so buttons drop to a second row on narrow phone screens instead of overflowing */
+  gap: 10px;
+}
+
+.actions button {
+  padding: 10px 16px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 4px;
+  background-color: #3a3a3c;
+  color: white;
+  cursor: pointer;
+  /* Same accessibility guideline as the to-do list's delete button:
+     Apple/Google recommend at least 44x44px touch targets. */
+  min-height: 44px;
+}
