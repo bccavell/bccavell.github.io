@@ -1,0 +1,7 @@
+# Xcode-generated files that are specific to your machine/user, not
+# the actual project - same idea as ignoring node_modules for a JS
+# project: recreated automatically, not something to track in git.
+xcuserdata/
+DerivedData/
+*.xcworkspace/xcuserdata/
+.DS_Store

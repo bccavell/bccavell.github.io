@@ -15,6 +15,7 @@ projects you've actually built rather than a generic course.
 | 2 | To-do list | [todo.md](./todo.md) | [`/todo`](../todo) |
 | 3 | Fractional PMM website | [fractional-pmm-website.md](./fractional-pmm-website.md) | [`/fractional-pmm-website`](../fractional-pmm-website) |
 | 4 | Voice to Text | [voice-to-text.md](./voice-to-text.md) | [`/voice-to-text`](../voice-to-text) |
+| 5 | Voice to Text (Mac menu bar app) | [voice-to-text-mac-app.md](./voice-to-text-mac-app.md) | [`/voice-to-text-mac-app`](../voice-to-text-mac-app) |
 
 ## Concepts covered so far
 
@@ -52,3 +53,8 @@ actually new each time).
 - Promises and `async`/`await`
 - Blobs and generating a downloadable file with `URL.createObjectURL`
 - The `::placeholder` pseudo-element and `@keyframes` animations
+- Swift language basics (optionals, `guard let`, closures) and Xcode
+- The delegate pattern (`AppDelegate`)
+- Native macOS system permissions (Microphone, Speech Recognition,
+  Accessibility, Input Monitoring) beyond the browser sandbox
+- Global event monitoring and synthetic keyboard input
