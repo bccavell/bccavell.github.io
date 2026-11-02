@@ -1,10 +1,15 @@
 # January Visit App: Tickets
 
-These are written to drop straight into **Linear**. You can import
-[`linear-import.csv`](./linear-import.csv) with *Linear → Settings → Import →
-CSV*, or copy them in by hand.
+> ✅ **These now live in Linear:** [January Visit App project](https://linear.app/lorestil/project/january-visit-app-6cf93b2d0690)
+> (team `LOR`). **Linear is the source of truth from here on.** This file is
+> the original plan, kept for reference.
+>
+> **ID mapping:** `JV-n` here = `LOR-(n+4)` in Linear. For example, JV-1 → LOR-5,
+> JV-27 → LOR-31, and JV-48 → LOR-52.
+> Name branches after the Linear issue (e.g. `billyccavell/lor-33-database-schema-sql-migration-file`)
+> so PRs link automatically.
 
-**Suggested Linear setup**
+**Linear setup (as created)**
 - **Team:** `Billy` (key `BC`) or a dedicated `JV` team
 - **Project:** *January Visit App*, target date 27 Dec 2026
 - **Milestones:** M1 Foundation · M2 Real content · M3 Polish & test · M4 Launch · M5 Shared backend · M6 Extras
