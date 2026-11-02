@@ -1,0 +1,34 @@
+Title,Description,Status,Priority,Labels,Estimate,Project
+JV-1 Write product spec,Done. See january-visit/planning/SPEC.md,Done,Medium,design,S,January Visit App
+JV-2 App shell + bottom tab navigation,"5 tabs, remembers last tab, works at 320px.",Done,High,feature,M,January Visit App
+JV-3 data.js content file (config pattern),All editable content in one file.,Done,High,infra,S,January Visit App
+JV-4 Home: countdown / day X of Y / after-trip,Before/during/after states.,Done,High,feature,M,January Visit App
+JV-5 Plan: day cards from itinerary,"One card per day, today highlighted, birthday marked, jump-to-today.",Done,High,feature,M,January Visit App
+JV-6 Ideas board with hearts,"Add + heart ideas, sorted by hearts, saved in localStorage, textContent only.",Done,Medium,feature,M,January Visit App
+JV-7 Love thread with sealed notes,Notes newest first; future unlockDate shows sealed envelope; friends can add notes.,Done,High,feature,L,January Visit App
+JV-8 Birthday tab,"Countdown before; letter, gallery, confetti on/after the day.",Done,High,feature,M,January Visit App
+"JV-9 PWA: manifest, icons, service worker","Installable on iOS/Android, works offline.",Done,High,infra,M,January Visit App
+JV-10 ?today= preview mode,Pretend it's another date for testing.,Done,Low,infra,XS,January Visit App
+JV-11 Learning pack,learning-packs/january-visit.md,Done,Low,learning,S,January Visit App
+"JV-12 Fill in TRIP names, dates, city",Edit january-visit/data.js,Todo,Urgent,content,XS,January Visit App
+JV-13 Fill in BIRTHDAY,"Who, date, age, letter, photos.",Todo,Urgent,content,S,January Visit App
+JV-14 Draft the itinerary,At least one plan per weekend.,Todo,High,content,M,January Visit App
+JV-15 Pick + resize photos,"Into january-visit/photos/, ~1600px wide, under 500KB.",Todo,High,content,S,January Visit App
+JV-16 Write 10+ love notes,Include ~5 sealed 'open when' notes with unlockDate.,Todo,High,content,M,January Visit App
+JV-17 Photo consent check,Ask friends if OK with an unlisted public page.,Todo,High,content,XS,January Visit App
+JV-18 Test on iPhone,Install + offline in Safari.,Backlog,Medium,infra,S,January Visit App
+JV-19 Test on Android,Install + offline in Chrome.,Backlog,Medium,infra,S,January Visit App
+JV-20 Birthday rehearsal,Walk through with ?today=<birthday>.,Backlog,Medium,infra,XS,January Visit App
+JV-21 Accessibility pass,Contrast + alt text on every photo.,Backlog,Medium,design,S,January Visit App
+JV-22 Map link per event,maps.google.com/?q= + encodeURIComponent(place). Great first solo ticket.,Backlog,Low,feature,S,January Visit App
+JV-23 Add to calendar (.ics),"Generate iCalendar text, download via Blob + <a download>.",Backlog,Low,feature,M,January Visit App
+JV-24 Write install message for friends,iPhone: Share > Add to Home Screen. Android: menu > Install app.,Backlog,Medium,content,XS,January Visit App
+JV-25 Merge + check live URL,bccavell.github.io/january-visit/,Backlog,High,infra,XS,January Visit App
+JV-26 Send it!,💌,Backlog,High,content,XS,January Visit App
+JV-27 Spike: Supabase vs Firebase,Recommend Supabase.,Backlog,Low,v2,S,January Visit App
+JV-28 Shared ideas across phones,Needs backend.,Backlog,Low,v2,L,January Visit App
+JV-29 Shared love thread across phones,Needs backend.,Backlog,Low,v2,L,January Visit App
+JV-30 Upload photos in-app,Needs backend storage.,Backlog,Low,v2,L,January Visit App
+JV-31 Daily photo challenge,,Backlog,Low,v2,M,January Visit App
+JV-32 End-of-trip memories page,,Backlog,Low,v2,M,January Visit App
+JV-33 Packing list,Reuse To-Do project code.,Backlog,Low,v2,S,January Visit App
