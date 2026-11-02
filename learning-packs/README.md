@@ -63,3 +63,5 @@ actually new each time).
 - Spread operator `...` and `.sort()` with a compare function
 - `<dialog>` / `showModal()`, simple state machines, image preloading,
   `scroll-snap`, `conic-gradient`, passing JS values into CSS variables
+- QR codes + error correction, SVG, print CSS (`@media print`, `@page`,
+  `mm` units), single source of truth across pages

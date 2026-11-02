@@ -29,6 +29,9 @@ responsive design. This project adds:
 - **Highlight reels** (Instagram-style stories): `<dialog>` + `showModal()`,
   a tiny "state machine", image preloading, `scroll-snap`, `conic-gradient`,
   the Ken Burns effect, and passing JS values into CSS custom properties
+- **The printable welcome card**: QR codes and error correction, SVG,
+  `@media print` + `@page`, real-world units (`mm`), and reusing `data.js`
+  across two pages (single source of truth)
 - Smaller bits: the spread operator `...`, `.sort()` with a compare function,
   `padStart`, `.closest()`, `loading="lazy"`, `<figure>`/`<figcaption>`
 
@@ -220,3 +223,33 @@ like Instagram stories.
 **Real world:** Snapchat invented the Stories format in 2013. Instagram,
 WhatsApp, Facebook and LinkedIn all copied it, and the tap-left/tap-right
 gesture and progress bars you built are the same pattern they use.
+
+### The welcome card: QR codes, SVG and print CSS
+
+`welcome-card.html` is a postcard-sized (A6) card with a QR code that opens
+the app. Print it and leave it on the guest bed.
+
+- **QR codes and error correction:** a QR code stores your link *plus*
+  backup copies of it. At the "High" level about 30% of the code can be
+  covered or scuffed and it still scans. That's why we can put a 💛 over the
+  middle. (We checked: it scans with the heart on, both on screen and in
+  the printed PDF.) **Analogy:** a group chat where everyone has a copy of
+  the plan. Lose a few phones and you still know where you're meeting.
+- **SVG:** a picture made of shapes instead of pixels, so it stays sharp at
+  any size. That matters a lot for something you print and then scan.
+- **Build once, not every time:** `planning/make_qr.py` makes the QR picture
+  once and saves it. The page doesn't regenerate it on every visit. You only
+  re-run the script if the link changes.
+- **`@media print` and `@page`:** CSS that applies only when printing. The
+  same page shows a "Print" button and a shadow on screen, while on paper
+  it's an edge-to-edge A6 card. `@page { size: 105mm 148mm }` sets the
+  paper size. We wrote the numbers out because some browsers ignore the word
+  "A6" and quietly use their default paper instead (we hit exactly this bug!).
+- **Real-world units:** `mm` in CSS means real millimetres when printed.
+- **Single source of truth:** the card loads the *same* `data.js` as the app.
+  Change a name once and both update, so they can't drift apart.
+
+**Real world:** restaurants put menu QR codes on tables, airlines use them
+for boarding passes, and Spotify and WhatsApp have their own branded QR codes
+with a logo in the middle, using the same error-correction trick you used
+for the heart.

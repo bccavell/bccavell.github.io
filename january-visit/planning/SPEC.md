@@ -66,7 +66,11 @@ App Store listing. Neither matters for 3 to 5 friends.
      full-screen photo story with an auto title card, captions, a slow zoom,
      and tap left/right to navigate.
    - First reel: **Highlands Roadtrip**, using photos from Billy's Google Photos album.
-8. **Preview mode for Billy**
+8. **Printable welcome card** 💌
+   - `welcome-card.html`: an A6 card with a QR code that opens the app, plus
+     install steps and a handwritten-style note. Names, dates and the note
+     come from `data.js`.
+9. **Preview mode for Billy**
    - Add `?today=2027-01-15` to the URL to pretend it's a different date.
      This lets Billy test sealed notes and the birthday screen early.
 

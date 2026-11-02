@@ -37,6 +37,9 @@ const TRIP = {
   welcomeMessage:
     "I can't believe you're actually coming. A whole month together! " +
     "This little app is our home base: plans, ideas, and a lot of love. 💛",
+  // The handwritten note at the bottom of the printable welcome card
+  // (welcome-card.html). Keep it short, about 15 words, to fit.
+  cardNote: "So happy you're here. Let's make it the best month ever.",
 };
 
 
