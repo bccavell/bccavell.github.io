@@ -61,3 +61,5 @@ actually new each time).
 - Dark mode (`prefers-color-scheme`), `position: fixed`, safe-area insets,
   `@keyframes` animations, `prefers-reduced-motion`
 - Spread operator `...` and `.sort()` with a compare function
+- `<dialog>` / `showModal()`, simple state machines, image preloading,
+  `scroll-snap`, `conic-gradient`, passing JS values into CSS variables

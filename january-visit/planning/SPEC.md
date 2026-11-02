@@ -61,7 +61,12 @@ App Store listing. Neither matters for 3 to 5 friends.
 6. **Installable and offline**
    - A web app manifest (name, icon, colours) plus a service worker that
      caches the app so it opens with no signal, e.g. on the Tube or a plane.
-7. **Preview mode for Billy**
+7. **Highlight reels** 🎞️
+   - Round bubbles on Home (like Instagram highlights). Tap one to play a
+     full-screen photo story with an auto title card, captions, a slow zoom,
+     and tap left/right to navigate.
+   - First reel: **Highlands Roadtrip**, using photos from Billy's Google Photos album.
+8. **Preview mode for Billy**
    - Add `?today=2027-01-15` to the URL to pretend it's a different date.
      This lets Billy test sealed notes and the birthday screen early.
 

@@ -111,6 +111,34 @@ const LOVE_NOTES = [
 
 
 // ------------------------------------------------------------
+// Highlight reels 🎞️
+// ------------------------------------------------------------
+// These show as round bubbles on the Home tab (like Instagram
+// highlights). Tapping one plays its photos full-screen as a
+// "story": each photo shows for a few seconds, then moves on.
+//
+// Each reel automatically starts with a title card made from
+// `title`, `subtitle` and `emoji`. You only need to list the photos.
+// `cover` is the photo shown in the round bubble. Leave it out and
+// the first photo is used.
+//
+// ⚠️ Shrink photos first (see photos/README.md), and only add ones
+// everyone's happy to have on an unlisted page.
+const HIGHLIGHT_REELS = [
+  {
+    title: "Highlands Roadtrip",
+    subtitle: "Where it all started 🏔️", // TODO: when was the trip?
+    emoji: "🏔️",
+    photos: [
+      // TODO: add your favourite photos from the Google Photos album, e.g.
+      // { src: "photos/highlands/01.jpg", caption: "Glencoe, before the rain" },
+      // { src: "photos/highlands/02.jpg", caption: "Car karaoke champions 🎤" },
+    ],
+  },
+];
+
+
+// ------------------------------------------------------------
 // Starter ideas for the Ideas board
 // ------------------------------------------------------------
 // These show up for everyone. Anything friends add is saved on

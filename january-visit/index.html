@@ -67,6 +67,10 @@
         <p id="home-headline" class="headline"></p>
       </div>
 
+      <!-- Highlight reel bubbles get built here from HIGHLIGHT_REELS -->
+      <h2 class="highlights-heading">Highlights</h2>
+      <div id="highlights" class="highlights"></div>
+
       <div class="card">
         <p id="welcome-message"></p>
         <p class="muted signature">– <span id="host-name"></span></p>
@@ -115,6 +119,22 @@
     </section>
 
   </main>
+
+  <!--
+    The full-screen story viewer for highlight reels.
+
+    <dialog> is a built-in HTML element for pop-up windows. Calling
+    dialog.showModal() from JavaScript shows it on top of everything,
+    blocks taps on the page behind it, and closes it when the user
+    presses Escape, all for free. Before <dialog> existed, every site
+    had to build this behaviour by hand.
+  -->
+  <dialog id="story" class="story" aria-label="Highlight reel">
+    <div id="story-progress" class="story-progress"></div>
+    <button id="story-close" class="story-close" type="button" aria-label="Close">✕</button>
+    <div id="story-slide" class="story-slide"></div>
+    <p class="story-hint" aria-hidden="true">tap left / right</p>
+  </dialog>
 
   <!--
     Bottom tab bar. Each button has a data-tab attribute naming which

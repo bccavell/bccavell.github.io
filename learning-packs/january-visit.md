@@ -26,6 +26,9 @@ responsive design. This project adds:
 - **XSS**: why user text goes in with `textContent`, never `innerHTML`
 - **CSS**: dark mode (`prefers-color-scheme`), `position: fixed`, safe-area
   insets, `@keyframes` animations, `prefers-reduced-motion`
+- **Highlight reels** (Instagram-style stories): `<dialog>` + `showModal()`,
+  a tiny "state machine", image preloading, `scroll-snap`, `conic-gradient`,
+  the Ken Burns effect, and passing JS values into CSS custom properties
 - Smaller bits: the spread operator `...`, `.sort()` with a compare function,
   `padStart`, `.closest()`, `loading="lazy"`, `<figure>`/`<figcaption>`
 
@@ -187,3 +190,33 @@ so faking the date only needed changing in *one* place.
 **Real world:** that's "dependency injection" in miniature. Testers at every
 big company fake the clock like this so they don't have to wait until New
 Year's Eve to test a New Year feature.
+
+### Highlight reels: `<dialog>`, state machines and preloading
+
+Tap a round bubble on Home and photos play full-screen, one at a time,
+like Instagram stories.
+
+- **`<dialog>` + `showModal()`:** a built-in HTML pop-up. You get "sits on
+  top of everything", "blocks the page behind it" and "Escape closes it"
+  without writing any of that yourself. Its `close` event is where we stop the
+  timer, so the timer stops however the viewer was closed.
+- **A tiny state machine:** the viewer is only ever in one state, "showing
+  slide N". Tapping right, tapping left, or the timer running out just change
+  N and redraw. Thinking in states like this keeps tricky UI code from
+  turning into spaghetti. **Analogy:** a traffic light. It's always exactly
+  one colour, and only specific things move it to the next.
+- **`clearTimeout` before every new timer:** without it, quick taps would
+  leave several timers running at once and slides would skip by themselves.
+  This "forgot to cancel the old timer" bug is very common.
+- **Preloading:** `new Image().src = nextPhoto` quietly downloads the next
+  photo while you're looking at this one, so it appears instantly.
+- **JS → CSS:** `style.setProperty("--slide-ms", ...)` hands the slide length
+  to the CSS progress-bar animation, so the bar and the timer always agree.
+- **CSS:** `scroll-snap` makes the bubble row settle neatly as you swipe,
+  `conic-gradient` draws the colourful ring, and `@keyframes` does the slow
+  "Ken Burns" zoom, named after the documentary maker who made it famous.
+  Reduced motion turns the zoom off.
+
+**Real world:** Snapchat invented the Stories format in 2013. Instagram,
+WhatsApp, Facebook and LinkedIn all copied it, and the tap-left/tap-right
+gesture and progress bars you built are the same pattern they use.

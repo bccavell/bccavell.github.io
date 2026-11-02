@@ -707,6 +707,194 @@ function launchConfetti() {
 
 
 // ============================================================
+// PART 9b: Highlight reels 🎞️ (Instagram-style stories)
+// ============================================================
+// Two pieces:
+//   1. A row of round "bubbles" on Home, one per reel.
+//   2. A full-screen story viewer (<dialog>) that plays one
+//      slide at a time and moves on by itself after a few seconds.
+//
+// The viewer is a small "state machine". At any moment it's
+// in one state: "showing slide N of reel R". Everything it does
+// (tap right, tap left, timer runs out) just changes N and redraws.
+// That's render-from-data again, with a timer added.
+
+const SLIDE_MS = 4500; // how long each slide shows (4.5 seconds)
+
+const highlightsRow = document.getElementById("highlights");
+const story = document.getElementById("story");
+const storyProgress = document.getElementById("story-progress");
+const storySlide = document.getElementById("story-slide");
+
+// The viewer's state. `let` because all three change as you tap.
+let storySlides = [];   // the slides of the reel that's open
+let storyIndex = 0;     // which slide is showing
+let storyTimer = null;  // the id setTimeout gives back, so we can cancel it
+
+// Turn a reel from data.js into a list of slides. The first slide is
+// always a title card, made automatically, so every reel gets a nice
+// intro without having to make an image for it.
+function buildSlides(reel) {
+  const slides = [{ type: "title", reel: reel }];
+  reel.photos.forEach((photo) => {
+    slides.push({ type: "photo", src: photo.src, caption: photo.caption });
+  });
+  // No photos yet? Add a friendly placeholder instead of an empty reel.
+  if (reel.photos.length === 0) {
+    slides.push({ type: "empty" });
+  }
+  return slides;
+}
+
+function renderHighlights() {
+  highlightsRow.innerHTML = "";
+
+  HIGHLIGHT_REELS.forEach((reel, index) => {
+    const bubble = el("button", "highlight-bubble");
+    bubble.type = "button";
+    bubble.dataset.reel = index; // remember WHICH reel this bubble opens
+    bubble.setAttribute("aria-label", `Play the ${reel.title} highlights`);
+
+    // The circle shows the cover photo if there is one, otherwise the emoji.
+    const ring = el("span", "highlight-ring");
+    const coverSrc = reel.cover || (reel.photos[0] && reel.photos[0].src);
+    if (coverSrc) {
+      const img = el("img");
+      img.src = coverSrc;
+      img.alt = ""; // decorative: the label below already says what it is
+      ring.appendChild(img);
+    } else {
+      ring.appendChild(el("span", "highlight-emoji", reel.emoji || "✨"));
+    }
+    bubble.appendChild(ring);
+    bubble.appendChild(el("span", "highlight-label", reel.title));
+    highlightsRow.appendChild(bubble);
+  });
+}
+
+// Event delegation again: one listener for every bubble.
+highlightsRow.addEventListener("click", (event) => {
+  const bubble = event.target.closest(".highlight-bubble");
+  if (!bubble) return;
+  openStory(HIGHLIGHT_REELS[Number(bubble.dataset.reel)]);
+});
+
+function openStory(reel) {
+  storySlides = buildSlides(reel);
+  storyIndex = 0;
+  story.showModal(); // show the <dialog> on top of everything
+  showSlide();
+}
+
+function closeStory() {
+  story.close(); // this also fires the "close" event below
+}
+
+// Whenever the dialog closes, however that happened (✕ button,
+// Escape key, or the last slide finishing), stop the timer.
+// Otherwise it would keep ticking in the background.
+story.addEventListener("close", () => {
+  clearTimeout(storyTimer);
+  storySlide.innerHTML = "";
+});
+
+function showSlide() {
+  // Cancel the previous slide's timer first. Without this, tapping
+  // quickly would leave several timers running at once, and slides
+  // would start skipping ahead on their own.
+  clearTimeout(storyTimer);
+
+  const slide = storySlides[storyIndex];
+  storySlide.innerHTML = "";
+
+  if (slide.type === "title") {
+    const card = el("div", "story-title-card");
+    card.appendChild(el("p", "story-title-emoji", slide.reel.emoji || "✨"));
+    card.appendChild(el("h2", "", slide.reel.title));
+    if (slide.reel.subtitle) card.appendChild(el("p", "", slide.reel.subtitle));
+    storySlide.appendChild(card);
+  } else if (slide.type === "empty") {
+    const card = el("div", "story-title-card");
+    card.appendChild(el("p", "story-title-emoji", "📸"));
+    card.appendChild(el("p", "", "Photos coming soon…"));
+    storySlide.appendChild(card);
+  } else {
+    const img = el("img", "story-photo");
+    img.src = slide.src;
+    img.alt = slide.caption || "Highlight photo";
+    storySlide.appendChild(img);
+    if (slide.caption) storySlide.appendChild(el("p", "story-caption", slide.caption));
+  }
+
+  // PRELOADING: start downloading the NEXT photo now, while this
+  // one is on screen. `new Image()` makes an image that's never shown;
+  // setting its src makes the browser fetch and remember the file.
+  // That way the next slide appears instantly instead of loading.
+  const upcoming = storySlides[storyIndex + 1];
+  if (upcoming && upcoming.type === "photo") {
+    new Image().src = upcoming.src;
+  }
+
+  renderProgress();
+  storyTimer = setTimeout(goForward, SLIDE_MS);
+}
+
+// The thin bars along the top: one per slide. Bars before the
+// current slide are full, the current one fills up (a CSS animation
+// lasting SLIDE_MS), and later ones are empty.
+function renderProgress() {
+  storyProgress.innerHTML = "";
+  storySlides.forEach((slide, index) => {
+    const bar = el("span", "story-bar");
+    const fill = el("span", "story-bar-fill");
+    if (index < storyIndex) fill.classList.add("done");
+    if (index === storyIndex) {
+      fill.classList.add("playing");
+      // Pass the JS number into CSS as a custom property, so the
+      // animation's length always matches SLIDE_MS above.
+      fill.style.setProperty("--slide-ms", SLIDE_MS + "ms");
+    }
+    bar.appendChild(fill);
+    storyProgress.appendChild(bar);
+  });
+}
+
+function goForward() {
+  if (storyIndex < storySlides.length - 1) {
+    storyIndex = storyIndex + 1;
+    showSlide();
+  } else {
+    closeStory(); // finished the last slide
+  }
+}
+
+function goBack() {
+  // Math.max stops us going below 0. On the first slide, "back"
+  // just restarts that slide.
+  storyIndex = Math.max(0, storyIndex - 1);
+  showSlide();
+}
+
+// Tap the left third of the screen to go back, anywhere else to go
+// forward. This is the same gesture Instagram and Snapchat use.
+story.addEventListener("click", (event) => {
+  if (event.target.closest(".story-close")) {
+    closeStory();
+    return;
+  }
+  // getBoundingClientRect() gives an element's position and size on
+  // screen, so we can work out where the tap landed within it.
+  const box = story.getBoundingClientRect();
+  const tapX = event.clientX - box.left;
+  if (tapX < box.width / 3) {
+    goBack();
+  } else {
+    goForward();
+  }
+});
+
+
+// ============================================================
 // PART 10: Start the app
 // ============================================================
 document.getElementById("app-title").textContent = TRIP.title;
@@ -721,6 +909,7 @@ renderPlan();
 renderIdeas();
 renderNotes();
 renderBirthday();
+renderHighlights();
 
 // Which tab to start on? On the birthday itself, always open the
 // birthday tab (surprise!). Otherwise reopen the last tab used, or
