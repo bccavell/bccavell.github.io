@@ -91,7 +91,7 @@ only hold text, so we convert arrays and objects to text with
 
 **Important limit:** it lives on *one device*. Your friend's notes are only on
 their phone. Sharing between phones needs a server. That's the v2 tickets
-(JV-27 to JV-29), where a service like Supabase would act as the shared notebook.
+(milestone M5, JV-27 to JV-43), where Supabase would act as the shared notebook.
 
 **Analogy:** localStorage is a sticky note on *your* fridge. A server database
 is a shared Google Doc.

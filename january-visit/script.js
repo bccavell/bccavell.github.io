@@ -141,7 +141,7 @@ const totalDays = daysBetween(tripStart, tripEnd) + 1; // +1: count both ends
 //
 // IMPORTANT: localStorage lives on ONE device. A note your friend
 // writes on their phone is NOT visible on yours. Sharing between
-// phones needs a server (that's ticket JV-28/29 for v2).
+// phones needs a server (that is milestone M5 in planning/TICKETS.md).
 
 // All our keys start with "jv-" so they can't clash with anything
 // else saved on bccavell.github.io (like a future app's data).

@@ -83,6 +83,22 @@ App Store listing. Neither matters for 3 to 5 friends.
 - An App Store or Play Store listing.
 - Strong privacy (see section 7).
 
+## 4b. Shared backend plan (M5)
+
+- **Supabase** (recommended): Postgres database, Storage for photos and
+  videos, Auth for magic-link login, and Realtime for live updates. The app
+  stays on GitHub Pages and the browser talks to Supabase directly.
+- **Stays in `data.js`:** Billy's itinerary, love notes and birthday letter.
+- **Moves to Supabase:** ideas, hearts (one per person) and the feed of
+  friend posts (text, photo or short video).
+- **Security:** Row Level Security means only emails on the `members` guest
+  list can read or write. The media bucket is private, which fixes the
+  "public photos" concern in section 7.
+- **Limits (free plan, check current pricing):** about 1 GB of storage,
+  about 50 MB per file, and the project pauses after about a week idle.
+  Photos are resized in the browser, and videos are capped at short clips.
+- **Pending decisions:** see ticket JV-27.
+
 ## 5. Data model (`data.js`)
 
 All content lives in **one file** that Billy edits, kept apart from the app
@@ -133,4 +149,5 @@ Mitigations in v1:
 | M2: Real content | 1 Dec 2026 | Names, dates, itinerary draft, photos, love notes |
 | M3: Polish and test | 15 Dec 2026 | Test on an iPhone and an Android, fix bugs, birthday rehearsal using `?today=` |
 | M4: Launch | 27 Dec 2026 | Send the link + "how to install" message to friends |
-| M5 (optional): v2 sharing | During the trip | Shared backend for ideas and notes |
+| M5: Shared backend | 27 Dec 2026 | Supabase: sign-in, shared ideas + hearts, photo/video feed (JV-27 to JV-43) |
+| M6 (optional): Extras | During the trip | Photo challenge, memories recap, comments |
