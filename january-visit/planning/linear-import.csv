@@ -1,0 +1,49 @@
+Title,Description,Status,Priority,Labels,Estimate,Project,Milestone,Blocked by
+JV-1 Write product spec,Done. See january-visit/planning/SPEC.md,Done,Medium,design,S,January Visit App,M1 Foundation,
+JV-2 App shell + bottom tab navigation,"5 tabs, remembers last tab, works at 320px.",Done,High,feature,M,January Visit App,M1 Foundation,
+JV-3 data.js content file (config pattern),All editable content in one file.,Done,High,infra,S,January Visit App,M1 Foundation,
+JV-4 Home: countdown / day X of Y / after-trip,Before/during/after states.,Done,High,feature,M,January Visit App,M1 Foundation,
+JV-5 Plan: day cards from itinerary,"One card per day, today highlighted, birthday marked, jump-to-today.",Done,High,feature,M,January Visit App,M1 Foundation,
+JV-6 Ideas board with hearts,"Add + heart ideas, sorted by hearts, saved in localStorage, textContent only.",Done,Medium,feature,M,January Visit App,M1 Foundation,
+JV-7 Love thread with sealed notes,Notes newest first; future unlockDate shows sealed envelope; friends can add notes.,Done,High,feature,L,January Visit App,M1 Foundation,
+JV-8 Birthday tab,"Countdown before; letter, gallery, confetti on/after the day.",Done,High,feature,M,January Visit App,M1 Foundation,
+"JV-9 PWA: manifest, icons, service worker","Installable on iOS/Android, works offline.",Done,High,infra,M,January Visit App,M1 Foundation,
+JV-10 ?today= preview mode,Pretend it's another date for testing.,Done,Low,infra,XS,January Visit App,M1 Foundation,
+JV-11 Learning pack,learning-packs/january-visit.md,Done,Low,learning,S,January Visit App,M1 Foundation,
+"JV-12 Fill in TRIP names, dates, city",Edit january-visit/data.js,Todo,Urgent,content,XS,January Visit App,M2 Real content,
+JV-13 Fill in BIRTHDAY,"Who, date, age, letter, photos.",Todo,Urgent,content,S,January Visit App,M2 Real content,
+JV-14 Draft the itinerary,At least one plan per weekend.,Todo,High,content,M,January Visit App,M2 Real content,
+JV-15 Pick + resize photos,"Into january-visit/photos/, ~1600px wide, under 500KB.",Todo,High,content,S,January Visit App,M2 Real content,
+JV-16 Write 10+ love notes,Include ~5 sealed 'open when' notes with unlockDate.,Todo,High,content,M,January Visit App,M2 Real content,
+JV-17 Photo consent check,Ask friends if OK with an unlisted public page.,Todo,High,content,XS,January Visit App,M2 Real content,
+JV-18 Test on iPhone,Install + offline in Safari.,Backlog,Medium,infra,S,January Visit App,M3 Polish & test,
+JV-19 Test on Android,Install + offline in Chrome.,Backlog,Medium,infra,S,January Visit App,M3 Polish & test,
+JV-20 Birthday rehearsal,Walk through with ?today=<birthday>.,Backlog,Medium,infra,XS,January Visit App,M3 Polish & test,
+JV-21 Accessibility pass,Contrast + alt text on every photo.,Backlog,Medium,design,S,January Visit App,M3 Polish & test,
+JV-22 Map link per event,maps.google.com/?q= + encodeURIComponent(place). Great first solo ticket.,Backlog,Low,feature,S,January Visit App,M3 Polish & test,
+JV-23 Add to calendar (.ics),"Generate iCalendar text, download via Blob + <a download>.",Backlog,Low,feature,M,January Visit App,M3 Polish & test,
+JV-24 Write install message for friends,iPhone: Share > Add to Home Screen. Android: menu > Install app.,Backlog,Medium,content,XS,January Visit App,M4 Launch,
+JV-25 Merge + check live URL,bccavell.github.io/january-visit/,Backlog,High,infra,XS,January Visit App,M4 Launch,
+JV-26 Send it!,💌,Backlog,High,content,XS,January Visit App,M4 Launch,
+"JV-27 Decide: backend, login method, video plan","Billy to confirm: (a) Supabase vs Firebase (rec: Supabase), (b) magic email link vs shared trip code (rec: magic link), (c) videos: short clips on free plan vs ~$25 Pro month (rec: short clips). Done when decisions are recorded in SPEC.md.",Todo,Urgent,backend,XS,January Visit App,M5 Shared backend,
+JV-28 Create Supabase project + config.js,Billy creates free Supabase project (EU region) and shares Project URL + anon/public key (NEVER the service_role key). Add january-visit/config.js. Acceptance: test request succeeds. Anon key is safe to commit because RLS protects data.,Todo,High,infra,S,January Visit App,M5 Shared backend,JV-27
+JV-29 Database schema (SQL migration file),"january-visit/supabase/schema.sql: members(id->auth.users, email unique, display_name), ideas(id, text<=120, added_by, created_at), idea_hearts(idea_id cascade, member_id, PK both), posts(id, author, caption<=1000, media_path, media_type photo|video|null, created_at). Seed STARTER_IDEAS. Commented line by line.",Backlog,High,backend,M,January Visit App,M5 Shared backend,JV-28
+JV-30 Row Level Security: members-only access,"Enable RLS on all tables; is_member() helper on auth.uid(). Members SELECT all, INSERT as self, DELETE own only. No UPDATE on members. Acceptance: anon=0 rows, non-member=0 rows, member=all. Record test results in PR.",Backlog,High,security,M,January Visit App,M5 Shared backend,JV-29
+JV-31 Supabase JS client + api.js data layer,"Load @supabase/supabase-js from CDN pinned to exact version. api.js: getIdeas, addIdea, toggleHeart, getPosts, createPost, deletePost. Only file that talks to Supabase. async/await + try/catch with friendly errors.",Backlog,High,infra,S,January Visit App,M5 Shared backend,JV-28
+JV-32 Magic-link sign-in screen,Email -> magic link -> signed in on device. 'Not on the guest list' message for non-members. Sign out in settings. Billy's plan/notes/birthday visible without login. Test iPhone home-screen app redirect (links open in Safari).,Backlog,High,feature,M,January Visit App,M5 Shared backend,"JV-30, JV-31"
+JV-33 Ideas board on Supabase (1 heart per person),"Replace localStorage ideas/hearts with api.js. Heart = toggle, one per person (PK), count = rows. Show who hearted. Acceptance: idea added on phone A visible on phone B after refresh.",Backlog,High,feature,M,January Visit App,M5 Shared backend,JV-32
+JV-34 Private media storage bucket + policies,"Private bucket 'media'. Members upload to posts/<user-id>/..., members read all, delete own. Acceptance: logged-out file request fails.",Backlog,High,security,S,January Visit App,M5 Shared backend,JV-30
+JV-35 Feed: post a photo (auto-resize before upload),"'+' button on Love tab, file input accept image/*,video/* capture. Resize in browser via canvas (max 1600px, JPEG 0.8). Upload to Storage then insert posts row; progress indicator. Text-only posts allowed (replace v1 local notes). Acceptance: iPhone photo posts in <5s on 4G.",Backlog,High,feature,L,January Visit App,M5 Shared backend,"JV-32, JV-34"
+JV-36 Feed: post a short video (size limit),Reject videos over plan limit (~50MB free) BEFORE upload with friendly message (try <30s at 1080p). Preview before posting.,Backlog,Medium,feature,M,January Visit App,M5 Shared backend,JV-35
+"JV-37 Feed: display posts (signed URLs, lazy load, paging)","Newest first, 20 per page + Load more. Signed URLs for private media. Images loading=lazy; video controls playsinline preload=metadata. Merge Billy's LOVE_NOTES by date; sealed notes still work. Smooth with 100+ posts.",Backlog,High,feature,M,January Visit App,M5 Shared backend,JV-35
+JV-38 Realtime: live updates for ideas + feed,"Subscribe to INSERT/DELETE on posts, ideas, idea_hearts. Toast '✨ New post from Sam'. Acceptance: appears on phone B within ~2s.",Backlog,Medium,feature,M,January Visit App,M5 Shared backend,"JV-33, JV-37"
+"JV-39 Offline: cache last feed, block posting offline",Cache last feed + ideas in localStorage; app opens offline. Disable Post/Add when navigator.onLine is false with message. Don't cache Supabase API in service worker.,Backlog,Medium,infra,S,January Visit App,M5 Shared backend,JV-37
+JV-40 Delete your own post / idea,✕ with confirm on own items only; deleting a post also removes its Storage file. RLS blocks deleting others' items.,Backlog,Medium,feature,S,January Visit App,M5 Shared backend,"JV-33, JV-37"
+JV-41 Two-phone end-to-end test,"Two test accounts on two real phones: sign in, add idea, heart, photo, video, delete, airplane mode. Remove test accounts after.",Backlog,High,infra,S,January Visit App,M5 Shared backend,"JV-38, JV-39, JV-40"
+JV-42 Usage + keep-alive check before the trip,Check storage/bandwidth in dashboard. Free projects pause after ~1 week idle: open app on 1 Jan. Decide on Pro upgrade for January.,Backlog,Medium,infra,XS,January Visit App,M5 Shared backend,JV-41
+"JV-43 Learning pack: databases, SQL, auth, RLS, async/await","Databases & SQL, tables & keys, authentication vs authorisation, RLS, why anon key can be public, async/await & Promises, signed URLs, realtime/websockets.",Backlog,Low,learning,S,January Visit App,M5 Shared backend,JV-41
+JV-44 Daily photo challenge,Prompt of the day on the feed.,Backlog,Low,v2,M,January Visit App,M6 Extras,
+JV-45 End-of-trip memories recap page,Built from the feed.,Backlog,Low,v2,M,January Visit App,M6 Extras,
+JV-46 Packing list,Reuse To-Do project code.,Backlog,Low,v2,S,January Visit App,M6 Extras,
+JV-47 Comments + emoji reactions on posts,,Backlog,Low,v2,M,January Visit App,M6 Extras,
+JV-48 Download all photos as a zip after the trip,,Backlog,Low,v2,S,January Visit App,M6 Extras,

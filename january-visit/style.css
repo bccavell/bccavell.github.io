@@ -1,0 +1,524 @@
+/*
+  JANUARY VISIT - style.css
+
+  Warm and celebratory, unlike the dark Wordle/To-Do theme, since this
+  is a gift. Re-uses ideas from earlier projects: CSS custom properties
+  (the PMM site), Flexbox and Grid, box-sizing, and 16px inputs so
+  iPhones don't zoom in.
+
+  New here:
+    - Dark mode with @media (prefers-color-scheme: dark)
+    - position: fixed for the bottom tab bar
+    - env(safe-area-inset-bottom) for iPhones without a home button
+    - @keyframes animations (the confetti)
+*/
+
+/* ---------- Design tokens (colour palette in one place) ---------- */
+:root {
+  --bg: #fff8f0;          /* warm cream */
+  --card: #ffffff;
+  --text: #2d2a32;
+  --muted: #6e6875;
+  --accent: #ff7a6b;      /* coral */
+  --accent-soft: #ffe3df;
+  --gold: #ffc857;
+  --border: #f0e4d8;
+  --radius: 18px;
+  --shadow: 0 2px 10px rgba(45, 42, 50, 0.06);
+  --tab-height: 64px;
+}
+
+/*
+  Dark mode: if the phone is set to dark mode, this media query
+  switches on and we REDEFINE the same variables. Every rule below
+  uses var(--bg) etc., so the whole app re-colours itself with no
+  other changes. This is the big payoff of using CSS variables.
+*/
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1d1a22;
+    --card: #2a2631;
+    --text: #f6f1ec;
+    --muted: #b0a8b9;
+    --accent: #ff8f82;
+    --accent-soft: #4a2f33;
+    --border: #3a3542;
+    --shadow: none;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  /* system-ui uses the phone's own font (San Francisco on iPhone,
+     Roboto on Android), so it feels like a native app. */
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.5;
+  /* Leave room at the bottom so the fixed tab bar never covers content. */
+  padding-bottom: calc(var(--tab-height) + env(safe-area-inset-bottom) + 16px);
+}
+
+h1, h2, h3 { line-height: 1.2; }
+h2 { font-size: 1.4rem; margin: 24px 0 8px; }
+h3 { font-size: 1.05rem; margin: 0; }
+
+.muted { color: var(--muted); }
+
+/* ---------- Header ---------- */
+.app-header {
+  text-align: center;
+  /* env(safe-area-inset-top) = the notch height on iPhones (0 elsewhere). */
+  padding: calc(20px + env(safe-area-inset-top)) 16px 4px;
+}
+.app-header h1 { margin: 0; font-size: 1.8rem; }
+.app-header p { margin: 4px 0 0; font-size: 0.9rem; }
+
+main {
+  max-width: 560px; /* stay readable on laptops */
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+/* ---------- Cards ---------- */
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 16px;
+  margin: 12px 0;
+}
+
+.hero { text-align: center; padding: 24px 16px; }
+.eyebrow {
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+.headline { margin: 8px 0 0; font-size: 1.05rem; }
+.signature { text-align: right; margin-bottom: 0; }
+
+/* ---------- Countdown ---------- */
+.countdown {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin: 12px 0;
+}
+.countdown-unit {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 72px;
+  padding: 10px 8px;
+  border-radius: 14px;
+  background: var(--accent-soft);
+}
+.countdown-number {
+  /* clamp(min, preferred, max) (from the Wordle mobile work) makes the
+     number scale with screen width without getting silly. */
+  font-size: clamp(2rem, 10vw, 2.8rem);
+  font-weight: 800;
+  color: var(--accent);
+  /* tabular-nums makes every digit the same width, so the
+     countdown doesn't wobble left and right as the numbers change. */
+  font-variant-numeric: tabular-nums;
+}
+.countdown-label { font-size: 0.8rem; color: var(--muted); }
+
+/* ---------- Events (Plan + Home) ---------- */
+.event {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 10px 0;
+  border-top: 1px solid var(--border);
+}
+/* Inside Home's today list each event stands alone, so give it a card look. */
+#today-events > .event {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 16px;
+  margin-bottom: 8px;
+}
+.event-emoji { font-size: 1.6rem; line-height: 1; }
+.event-body p { margin: 0; }
+.event-title { font-weight: 600; }
+.event-meta { font-size: 0.9rem; color: var(--muted); }
+.event-notes { font-size: 0.9rem; margin-top: 2px; }
+
+.section-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.day-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+.day-tag {
+  font-size: 0.8rem;
+  color: var(--muted);
+  text-align: right;
+}
+.free-day { margin: 6px 0 0; }
+.day-card.is-today {
+  border: 2px solid var(--accent);
+}
+.day-card.is-today .day-tag::after { content: " · today"; color: var(--accent); }
+.day-card.is-past { opacity: 0.55; }
+
+/* ---------- Buttons and forms ---------- */
+button {
+  font: inherit;
+  cursor: pointer;
+  border: none;
+  border-radius: 999px; /* a huge radius = fully rounded "pill" ends */
+  background: var(--accent);
+  color: #fff;
+  padding: 10px 18px;
+  min-height: 44px; /* Apple's recommended minimum touch target */
+  font-weight: 600;
+}
+.pill-button { padding: 8px 14px; min-height: 40px; font-size: 0.9rem; }
+
+input, textarea {
+  font: inherit;
+  font-size: 1rem; /* 16px+ stops iOS zooming in */
+  width: 100%;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--text);
+}
+textarea { resize: vertical; }
+
+.inline-form { display: flex; gap: 8px; margin: 12px 0; }
+.inline-form input { flex: 1; min-width: 0; }
+
+.note-form { display: flex; flex-direction: column; gap: 8px; }
+.note-form button { align-self: flex-end; }
+
+/* ---------- Ideas ---------- */
+.idea-list { list-style: none; padding: 0; margin: 0; }
+.idea {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px 10px 16px;
+  margin: 8px 0;
+}
+.idea-text { flex: 1; }
+.heart-button {
+  background: var(--accent-soft);
+  color: var(--accent);
+  min-width: 64px;
+}
+.heart-button.has-hearts { background: var(--accent); color: #fff; }
+.delete-button {
+  background: transparent;
+  color: var(--muted);
+  padding: 8px 12px;
+  min-width: 44px;
+}
+
+/* ---------- Love notes ---------- */
+.note-text { white-space: pre-wrap; margin: 0 0 8px; } /* keep line breaks */
+.note-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+}
+.note-from { font-weight: 600; margin: 0; }
+.note.mine { border-left: 4px solid var(--gold); }
+.note-photo {
+  width: 100%;
+  border-radius: 12px;
+  margin-bottom: 10px;
+  display: block;
+}
+.note.sealed {
+  text-align: center;
+  background: var(--accent-soft);
+  border-style: dashed;
+}
+.note.sealed p { margin: 2px 0; }
+.sealed-icon { font-size: 2rem; }
+
+/* ---------- Birthday ---------- */
+.birthday-hero h2 { margin: 4px 0; font-size: 1.8rem; }
+.big-emoji { font-size: 4rem; margin: 0; }
+.letter p:first-child { white-space: pre-wrap; font-size: 1.05rem; }
+
+/* Two photos per row on phones, more on bigger screens (Grid from the PMM site). */
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 8px;
+  margin: 12px 0;
+}
+.gallery-item { margin: 0; }
+.gallery-item img {
+  width: 100%;
+  aspect-ratio: 1; /* square tiles */
+  object-fit: cover; /* crop to fill the square instead of squishing */
+  border-radius: 12px;
+  display: block;
+}
+.gallery-item figcaption { font-size: 0.8rem; color: var(--muted); padding-top: 4px; }
+
+/* ---------- Bottom tab bar ---------- */
+/*
+  position: fixed pins the bar to the bottom of the SCREEN, so it
+  stays put while the page scrolls. (Compare `sticky` on the PMM site,
+  which only sticks once you scroll to it.)
+*/
+.tab-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  background: var(--card);
+  border-top: 1px solid var(--border);
+  /* Extra padding on iPhones so the bar sits above the home swipe bar. */
+  padding-bottom: env(safe-area-inset-bottom);
+  z-index: 10; /* sit on top of the page content */
+}
+.tab-bar button {
+  flex: 1; /* five equal-width buttons */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  height: var(--tab-height);
+  padding: 8px 0;
+  background: transparent;
+  color: var(--muted);
+  border-radius: 0;
+  font-size: 0.7rem;
+  font-weight: 500;
+}
+.tab-bar button span { font-size: 1.35rem; line-height: 1; }
+.tab-bar button.active { color: var(--accent); font-weight: 700; }
+
+/* ---------- Confetti ---------- */
+/*
+  @keyframes describes an animation: where an element starts (from)
+  and ends (to). Each confetti piece runs it with a random duration,
+  set in script.js. `transform` moves things without making the
+  browser re-lay-out the page, so it stays smooth.
+*/
+.confetti {
+  position: fixed;
+  top: -20px;
+  z-index: 100;
+  pointer-events: none; /* taps pass straight through confetti */
+  border-radius: 2px;
+  animation-name: fall;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+}
+@keyframes fall {
+  from { transform: translateY(0) rotate(0deg); }
+  to   { transform: translateY(110vh) rotate(720deg); }
+}
+
+/* ---------- Highlight reels ---------- */
+.highlights-heading { margin-top: 16px; }
+
+/*
+  A sideways-scrolling row of bubbles. overflow-x: auto lets the row
+  scroll left/right once there are more bubbles than fit on screen,
+  instead of squashing them or wrapping onto a new line. This is the
+  same row style as Instagram's highlights and stories.
+*/
+.highlights {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  padding: 4px 2px 8px;
+  /* scroll-snap makes each swipe settle neatly on a bubble */
+  scroll-snap-type: x mandatory;
+}
+.highlight-bubble {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  color: var(--text);
+  padding: 0;
+  border-radius: 0;
+  flex-shrink: 0; /* don't let flexbox squash the bubbles */
+  scroll-snap-align: start;
+  font-weight: 500;
+}
+.highlight-ring {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  padding: 3px;
+  /* A gradient ring around the circle. conic-gradient sweeps colours
+     round a circle like the hands of a clock. */
+  background: conic-gradient(var(--accent), var(--gold), #b892ff, var(--accent));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.highlight-ring img,
+.highlight-emoji {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 3px solid var(--bg); /* thin gap between the ring and the photo */
+  object-fit: cover;
+  background: var(--accent-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+}
+.highlight-label {
+  font-size: 0.8rem;
+  max-width: 84px;
+  text-align: center;
+  line-height: 1.2;
+}
+
+/* ---------- Story viewer (the <dialog>) ---------- */
+.story {
+  /* Fill the whole screen. A dialog is normally a small centred box. */
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh; /* dvh = the visible height on phones, ignoring the
+                     browser bars. The line above is a fallback for
+                     older browsers that don't understand dvh. */
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: #000;
+  color: #fff;
+  overflow: hidden;
+}
+/* ::backdrop is the dimmed layer behind a modal dialog. */
+.story::backdrop { background: #000; }
+
+.story-progress {
+  position: absolute;
+  top: calc(10px + env(safe-area-inset-top));
+  left: 10px;
+  right: 10px;
+  display: flex;
+  gap: 4px;
+  z-index: 2;
+}
+.story-bar {
+  flex: 1;
+  height: 3px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.35);
+  overflow: hidden;
+}
+.story-bar-fill {
+  display: block;
+  height: 100%;
+  width: 0;
+  background: #fff;
+}
+.story-bar-fill.done { width: 100%; }
+.story-bar-fill.playing {
+  /* --slide-ms is set from JavaScript so the bar and timer always agree */
+  animation: fill-bar var(--slide-ms) linear forwards;
+}
+@keyframes fill-bar {
+  from { width: 0; }
+  to   { width: 100%; }
+}
+
+.story-close {
+  position: absolute;
+  top: calc(22px + env(safe-area-inset-top));
+  right: 8px;
+  z-index: 2;
+  background: transparent;
+  font-size: 1.3rem;
+  min-width: 44px;
+}
+
+.story-slide {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.story-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: contain; /* show the whole photo, letterboxed if needed */
+  /* The "Ken Burns" effect: a slow zoom that makes still photos feel
+     alive. It's named after the documentary maker who made it famous. */
+  animation: ken-burns 6s ease-out forwards;
+}
+@keyframes ken-burns {
+  from { transform: scale(1); }
+  to   { transform: scale(1.08); }
+}
+.story-caption {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: calc(40px + env(safe-area-inset-bottom));
+  margin: 0;
+  padding: 12px 20px;
+  text-align: center;
+  font-size: 1.05rem;
+  font-weight: 600;
+  /* A fade from transparent to dark keeps white text readable on any photo. */
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.6));
+}
+.story-title-card {
+  text-align: center;
+  padding: 24px;
+  animation: pop-in 0.5s ease-out;
+}
+.story-title-card h2 { font-size: 2rem; margin: 8px 0; }
+.story-title-emoji { font-size: 4rem; margin: 0; }
+@keyframes pop-in {
+  from { opacity: 0; transform: scale(0.92); }
+  to   { opacity: 1; transform: scale(1); }
+}
+.story-hint {
+  position: absolute;
+  bottom: calc(12px + env(safe-area-inset-bottom));
+  width: 100%;
+  margin: 0;
+  text-align: center;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* Respect "Reduce Motion": no zooming or popping, just plain slides. */
+@media (prefers-reduced-motion: reduce) {
+  .story-photo,
+  .story-title-card { animation: none; }
+}

@@ -1,0 +1,280 @@
+<!--
+  WELCOME CARD: a printable card with a QR code that opens the app.
+
+  Open this page on a laptop and press "Print card" (or Ctrl/Cmd + P).
+  It's sized for A6, which is postcard size: a quarter of an A4 sheet.
+  Print it on thick paper, and pop it on the guest bed or in a
+  welcome bag.
+
+  New ideas in this file:
+    - @media print and @page: CSS rules that only apply when PRINTING,
+      so the same page looks one way on screen and another on paper.
+    - Reusing data.js on a second page, so names and dates are written
+      in ONE place and both pages stay in sync automatically.
+    - Layering one element on top of another with position: absolute
+      (the heart over the middle of the QR code).
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Welcome Card · Our January</title>
+  <!--
+    Google Fonts: "Caveat" is a handwriting-style font for the personal
+    note. If it can't load (e.g. offline), the browser falls back to
+    the next font in the list, so nothing breaks.
+  -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&display=swap" rel="stylesheet" />
+  <style>
+    /* The same colour tokens as the app (style.css), so the card matches. */
+    :root {
+      --cream: #fff8f0;
+      --text: #2d2a32;
+      --muted: #6e6875;
+      --accent: #ff7a6b;
+      --gold: #ffc857;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      color: var(--text);
+      background: #e9dfd4; /* a "desk" colour around the card on screen */
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      padding: 24px 16px;
+    }
+
+    /*
+      The card itself. "mm" is a real-world unit: 105mm x 148mm is
+      exactly A6. On screen the browser converts mm to pixels, and on
+      paper it's the real size. max-width keeps it on-screen on phones.
+    */
+    .card {
+      width: 105mm;
+      max-width: 100%;
+      aspect-ratio: 105 / 148;
+      background: var(--cream);
+      border-radius: 6mm;
+      box-shadow: 0 8px 30px rgba(45, 42, 50, 0.18);
+      padding: 7mm 7mm 6mm;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* A soft coral-and-gold glow in the corners, purely decorative. */
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 0% 0%, rgba(255, 122, 107, 0.18), transparent 40%),
+        radial-gradient(circle at 100% 100%, rgba(255, 200, 87, 0.25), transparent 45%);
+      pointer-events: none;
+    }
+
+    .eyebrow {
+      margin: 0;
+      font-size: 3mm;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    h1 {
+      margin: 1mm 0 0;
+      font-size: 9mm;
+      line-height: 1.1;
+    }
+    .names {
+      margin: 1.5mm 0 0;
+      font-size: 3.6mm;
+      font-weight: 600;
+    }
+    .dates {
+      margin: 0.5mm 0 0;
+      font-size: 3.2mm;
+      color: var(--muted);
+    }
+
+    /*
+      The QR code with a heart on top. The wrapper is
+      position: relative, and the heart inside it is
+      position: absolute. That pins the heart to the WRAPPER (not the
+      whole page), and the 50% / translate(-50%) trick centres it exactly.
+      The heart covers a small patch of the code, which still scans
+      thanks to the code's built-in error correction (see make_qr.py).
+    */
+    .qr-wrap {
+      position: relative;
+      width: 60mm; /* big = easy to scan from across a table */
+      margin: 6mm 0 3mm;
+      padding: 2mm;
+      background: #fff;
+      border-radius: 4mm;
+      border: 0.6mm solid var(--accent);
+    }
+    .qr-wrap img {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+    .qr-heart {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 11mm; /* keep this under about 20% of the QR's width */
+      height: 11mm;
+      border-radius: 50%;
+      background: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 6.5mm;
+      line-height: 1;
+    }
+
+    .scan {
+      margin: 0;
+      font-weight: 700;
+      font-size: 4mm;
+      color: var(--accent);
+    }
+    .steps {
+      list-style: none;
+      padding: 0;
+      margin: 2mm 0 0;
+      font-size: 2.8mm;
+      line-height: 1.5;
+      color: var(--text);
+    }
+    .steps b { color: var(--accent); }
+
+    .note {
+      margin: auto 0 0; /* margin-top: auto pushes the note to the bottom */
+      font-family: "Caveat", "Bradley Hand", cursive;
+      font-size: 5.6mm;
+      line-height: 1.15;
+      color: var(--text);
+    }
+
+    .print-button {
+      font: inherit;
+      font-weight: 600;
+      border: none;
+      border-radius: 999px;
+      background: var(--accent);
+      color: #fff;
+      padding: 12px 22px;
+      min-height: 44px;
+      cursor: pointer;
+    }
+    .tip { margin: 0; font-size: 0.85rem; color: var(--muted); max-width: 105mm; text-align: center; }
+
+    /*
+      PRINT STYLES: everything in here applies ONLY when printing.
+      @page sets the paper: A6 with no margin, so the card fills
+      the sheet. We hide the button and tip, drop the shadow and
+      "desk" background, and tell the browser to print the background
+      colours (browsers skip them by default to save ink).
+    */
+    @page {
+      /* A6 = 105mm x 148mm. We give the exact numbers instead of the
+         word "A6" because some browsers don't recognise that keyword
+         and silently fall back to their default paper size. */
+      size: 105mm 148mm;
+      margin: 0;
+    }
+    @media print {
+      body {
+        background: none;
+        padding: 0;
+        min-height: auto;
+        display: block;
+      }
+      .card {
+        width: 105mm;
+        height: 148mm;
+        border-radius: 0;
+        box-shadow: none;
+        /* print-color-adjust: "yes, really print my background colours" */
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      .print-button,
+      .tip { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <article class="card">
+    <p class="eyebrow">Welcome to</p>
+    <h1 id="card-title">Our January</h1>
+    <p id="card-names" class="names"></p>
+    <p id="card-dates" class="dates"></p>
+
+    <div class="qr-wrap">
+      <img src="qr.svg" alt="QR code that opens the Our January app" />
+      <span class="qr-heart" aria-hidden="true">💛</span>
+    </div>
+
+    <p class="scan">Scan me with your camera 📱</p>
+    <ol class="steps">
+      <li><b>iPhone:</b> open in Safari → Share → <i>Add to Home Screen</i></li>
+      <li><b>Android:</b> open in Chrome → ⋮ → <i>Install app</i></li>
+    </ol>
+
+    <p id="card-note" class="note">So happy you're here. Let's make it the best month ever.</p>
+  </article>
+
+  <button class="print-button" type="button" onclick="window.print()">🖨️ Print card</button>
+  <p class="tip">Tip: in the print box choose <b>A6</b> paper (or print on A4 and trim it), set
+    scale to 100%, and switch on "Background graphics". Test-scan it with your phone before you print a stack!</p>
+
+  <!--
+    Load the SAME data.js the app uses, so names and dates are written
+    in one place only. Change a friend's name in data.js and the app
+    AND this card both update. This is the "single source of truth" idea.
+  -->
+  <script src="data.js"></script>
+  <script>
+    // A tiny script, so it lives right here in the page rather than in
+    // its own file.
+    document.getElementById("card-title").textContent = TRIP.title;
+    document.getElementById("card-names").textContent =
+      TRIP.hostName + " 💛 " + TRIP.friends.join(" & ");
+
+    // Same safe date parsing as script.js (see the time-zone trap there).
+    function parseDate(text) {
+      const parts = text.split("-").map(Number);
+      return new Date(parts[0], parts[1] - 1, parts[2]);
+    }
+    const options = { day: "numeric", month: "long" };
+    const start = parseDate(TRIP.startDate).toLocaleDateString("en-GB", options);
+    const end = parseDate(TRIP.endDate).toLocaleDateString("en-GB", options);
+    document.getElementById("card-dates").textContent =
+      TRIP.city + " · " + start + " – " + end;
+
+    // Only replace the note if data.js has one. Otherwise keep the default
+    // text written in the HTML above.
+    if (TRIP.cardNote) {
+      document.getElementById("card-note").textContent = TRIP.cardNote;
+    }
+  </script>
+</body>
+</html>

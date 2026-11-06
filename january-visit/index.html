@@ -1,0 +1,159 @@
+<!--
+  JANUARY VISIT, project #4: an installable app for my friends' visit.
+
+  New this time: this is a PWA ("Progressive Web App"). It's a normal
+  website, but thanks to two extra files it can be *installed* on a
+  phone home screen and work offline:
+    manifest.json -> tells the phone the app's name, icon and colours
+    sw.js         -> a "service worker" that saves files for offline use
+
+  The other files:
+    data.js   -> ALL the content (names, dates, plans, notes). Edit this!
+    script.js -> the app logic
+    style.css -> the looks
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <!--
+    viewport-fit=cover lets the app draw behind the iPhone's notch and
+    home bar when it's installed. The CSS then uses env(safe-area-inset-*)
+    to keep buttons out of those areas.
+  -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Our January 💛</title>
+
+  <!-- Unlisted, not secret: asks search engines not to list this page. -->
+  <meta name="robots" content="noindex, nofollow" />
+
+  <!-- PWA bits. The manifest is the app's "ID card". -->
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#ff7a6b" />
+  <!--
+    iPhones (Safari) only partly read manifest.json, so Apple also needs
+    these older apple-* tags to get the icon and full-screen look right.
+  -->
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Our January" />
+  <link rel="icon" href="icons/icon-192.png" />
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <header class="app-header">
+    <h1 id="app-title">Our January</h1>
+    <p id="app-subtitle" class="muted"></p>
+  </header>
+
+  <!--
+    <main> holds five <section>s, one per tab. All five exist on
+    the page the whole time. JavaScript just shows one and hides the
+    rest using the `hidden` attribute. This is a "single-page app":
+    switching tabs never loads a new page, which feels fast and
+    app-like and also helps it work offline.
+  -->
+  <main>
+
+    <!-- ===== HOME ===== -->
+    <section id="tab-home" class="tab-panel" aria-labelledby="nav-home">
+      <div class="card hero">
+        <p id="home-eyebrow" class="eyebrow"></p>
+        <!-- Countdown numbers get filled in by script.js every second -->
+        <div id="countdown" class="countdown" aria-live="polite"></div>
+        <p id="home-headline" class="headline"></p>
+      </div>
+
+      <!-- Highlight reel bubbles get built here from HIGHLIGHT_REELS -->
+      <h2 class="highlights-heading">Highlights</h2>
+      <div id="highlights" class="highlights"></div>
+
+      <div class="card">
+        <p id="welcome-message"></p>
+        <p class="muted signature">– <span id="host-name"></span></p>
+      </div>
+
+      <h2 id="today-heading">Today</h2>
+      <div id="today-events"></div>
+    </section>
+
+    <!-- ===== PLAN ===== -->
+    <section id="tab-plan" class="tab-panel" aria-labelledby="nav-plan" hidden>
+      <div class="section-top">
+        <h2>The plan</h2>
+        <button id="jump-today" class="pill-button" type="button">Jump to today</button>
+      </div>
+      <p class="muted">Loose plans, open to change. Add wishes on the Ideas tab ✨</p>
+      <div id="day-list"></div>
+    </section>
+
+    <!-- ===== IDEAS ===== -->
+    <section id="tab-ideas" class="tab-panel" aria-labelledby="nav-ideas" hidden>
+      <h2>Ideas board</h2>
+      <p class="muted">What do you want to do? Heart the ones you love ♥</p>
+      <!-- Same <form> trick as the To-Do app: pressing Enter submits it. -->
+      <form id="idea-form" class="inline-form">
+        <input id="idea-input" type="text" placeholder="e.g. Go to a comedy show" autocomplete="off" maxlength="120" required />
+        <button type="submit">Add</button>
+      </form>
+      <ul id="idea-list" class="idea-list"></ul>
+    </section>
+
+    <!-- ===== LOVE THREAD ===== -->
+    <section id="tab-love" class="tab-panel" aria-labelledby="nav-love" hidden>
+      <h2>Love thread 💌</h2>
+      <form id="note-form" class="note-form card">
+        <input id="note-from" type="text" placeholder="Your name" autocomplete="name" maxlength="40" required />
+        <textarea id="note-text" rows="3" placeholder="Leave a little love…" maxlength="1000" required></textarea>
+        <button type="submit">Post 💛</button>
+      </form>
+      <div id="note-list"></div>
+    </section>
+
+    <!-- ===== BIRTHDAY ===== -->
+    <section id="tab-birthday" class="tab-panel" aria-labelledby="nav-birthday" hidden>
+      <div id="birthday-content"></div>
+    </section>
+
+  </main>
+
+  <!--
+    The full-screen story viewer for highlight reels.
+
+    <dialog> is a built-in HTML element for pop-up windows. Calling
+    dialog.showModal() from JavaScript shows it on top of everything,
+    blocks taps on the page behind it, and closes it when the user
+    presses Escape, all for free. Before <dialog> existed, every site
+    had to build this behaviour by hand.
+  -->
+  <dialog id="story" class="story" aria-label="Highlight reel">
+    <div id="story-progress" class="story-progress"></div>
+    <button id="story-close" class="story-close" type="button" aria-label="Close">✕</button>
+    <div id="story-slide" class="story-slide"></div>
+    <p class="story-hint" aria-hidden="true">tap left / right</p>
+  </dialog>
+
+  <!--
+    Bottom tab bar. Each button has a data-tab attribute naming which
+    section it opens. ONE listener on the <nav> handles all five buttons
+    (event delegation, from the To-Do project).
+  -->
+  <nav id="tab-bar" class="tab-bar" aria-label="App sections">
+    <button id="nav-home" data-tab="home" type="button"><span aria-hidden="true">🏠</span>Home</button>
+    <button id="nav-plan" data-tab="plan" type="button"><span aria-hidden="true">🗓️</span>Plan</button>
+    <button id="nav-ideas" data-tab="ideas" type="button"><span aria-hidden="true">✨</span>Ideas</button>
+    <button id="nav-love" data-tab="love" type="button"><span aria-hidden="true">💌</span>Love</button>
+    <button id="nav-birthday" data-tab="birthday" type="button"><span aria-hidden="true">🎂</span>Birthday</button>
+  </nav>
+
+  <!--
+    ORDER MATTERS: data.js has to load first so that its TRIP,
+    ITINERARY, etc. already exist by the time script.js runs.
+  -->
+  <script src="data.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

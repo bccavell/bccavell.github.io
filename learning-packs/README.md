@@ -14,6 +14,7 @@ projects you've actually built rather than a generic course.
 | 1 | Wordle clone | [wordle.md](./wordle.md) | [`/wordle`](../wordle) |
 | 2 | To-do list | [todo.md](./todo.md) | [`/todo`](../todo) |
 | 3 | Fractional PMM website | [fractional-pmm-website.md](./fractional-pmm-website.md) | [`/fractional-pmm-website`](../fractional-pmm-website) |
+| 4 | January Visit app (PWA) | [january-visit.md](./january-visit.md) | [`/january-visit`](../january-visit) |
 
 ## Concepts covered so far
 
@@ -46,3 +47,21 @@ actually new each time).
 - CSS Grid with `repeat(auto-fit, minmax(...))` for responsive layouts
   without media queries
 - The `robots` meta tag and what "private" means on a static host
+- Writing a product spec and breaking it into tickets (Linear)
+- The config-file pattern (content in `data.js`, logic in `script.js`)
+- Dates: the `Date` object, date maths, and the time-zone trap
+- `localStorage` + `JSON.stringify` / `JSON.parse`
+- `try` / `catch` error handling
+- Timers: `setInterval` vs `setTimeout`
+- Single-page app tabs with the `hidden` attribute
+- PWAs: web app manifest + service worker (offline support)
+- Promises (first look, via `fetch` and the Cache API)
+- `URLSearchParams` (reading values from the URL)
+- XSS and why user text goes in via `textContent`
+- Dark mode (`prefers-color-scheme`), `position: fixed`, safe-area insets,
+  `@keyframes` animations, `prefers-reduced-motion`
+- Spread operator `...` and `.sort()` with a compare function
+- `<dialog>` / `showModal()`, simple state machines, image preloading,
+  `scroll-snap`, `conic-gradient`, passing JS values into CSS variables
+- QR codes + error correction, SVG, print CSS (`@media print`, `@page`,
+  `mm` units), single source of truth across pages
