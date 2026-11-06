@@ -65,3 +65,13 @@ actually new each time).
   `scroll-snap`, `conic-gradient`, passing JS values into CSS variables
 - QR codes + error correction, SVG, print CSS (`@media print`, `@page`,
   `mm` units), single source of truth across pages
+- Databases + SQL: tables, primary/foreign/combined keys, constraints,
+  indexes
+- Authentication vs authorisation, Row Level Security, public anon key vs
+  secret key
+- `async`/`await`, `try/catch/finally`, `Promise.all`, wrapping callbacks in
+  a Promise
+- Data layer + store/adapter patterns, IIFE, vendoring a library
+- File storage, signed URLs, shrinking images with `<canvas>`
+- Realtime (WebSockets), debouncing, cursor pagination, offline caching
+- SMTP (how email is sent), mocking for tests

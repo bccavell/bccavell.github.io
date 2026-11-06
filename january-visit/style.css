@@ -51,6 +51,18 @@
   box-sizing: border-box;
 }
 
+/*
+  GOTCHA FIX: the HTML `hidden` attribute hides things using
+  display: none, but ANY CSS rule that sets `display` (like
+  .note-form { display: flex }) quietly overrides it, and the
+  "hidden" element shows anyway. This rule makes `hidden` always win.
+  !important means "this beats other rules, even more specific ones".
+  Use it sparingly, but this is the classic case where it's right.
+*/
+[hidden] {
+  display: none !important;
+}
+
 body {
   margin: 0;
   /* system-ui uses the phone's own font (San Francisco on iPhone,
@@ -521,4 +533,110 @@ textarea { resize: vertical; }
 @media (prefers-reduced-motion: reduce) {
   .story-photo,
   .story-title-card { animation: none; }
+}
+
+/* ---------- Shared mode (Supabase): sign-in, ideas, posting ---------- */
+.account-bar {
+  margin: 6px 0 0;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+/* A button that looks like a link, for small secondary actions. */
+.link-button {
+  background: transparent;
+  color: var(--accent);
+  padding: 4px 6px;
+  min-height: 32px;
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+.gate { text-align: center; }
+.gate h3 { margin: 4px 0; }
+.gate-emoji { font-size: 2.2rem; margin: 0; }
+.gate-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.idea-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0; /* lets long ideas wrap instead of pushing buttons off-screen */
+}
+.idea-who { font-size: 0.8rem; color: var(--muted); }
+
+/*
+  Show the photo picker only in shared mode, and the name box only
+  in local mode. `body.shared-mode` is added by shared.js. This is a
+  neat trick: ONE class on <body> switches lots of things at once.
+*/
+.media-row { display: none; }
+body.shared-mode .media-row {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+body.shared-mode #note-from { display: none; }
+
+.media-button {
+  background: var(--accent-soft);
+  color: var(--accent);
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  cursor: pointer;
+  font-weight: 600;
+}
+/* Hides the real file input visually but keeps it usable (and
+   reachable by keyboard and screen readers). `display: none` would
+   break the label-click trick on some phones. */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+.note-preview { width: 100%; }
+.preview-media {
+  max-width: 100%;
+  max-height: 240px;
+  border-radius: 12px;
+  display: block;
+}
+.note-status { margin: 0; font-size: 0.85rem; min-height: 1em; }
+.note-status:empty { display: none; }
+button:disabled { opacity: 0.55; cursor: not-allowed; }
+
+.load-more { display: block; margin: 8px auto 16px; }
+
+/* Toasts: little messages that float above the tab bar. */
+.toast-region {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: calc(var(--tab-height) + env(safe-area-inset-bottom) + 12px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  z-index: 50;
+  pointer-events: none; /* taps go through to the page */
+}
+.toast {
+  background: var(--text);
+  color: var(--bg);
+  padding: 10px 16px;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  max-width: calc(100% - 32px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  animation: pop-in 0.25s ease-out;
 }

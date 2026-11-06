@@ -406,55 +406,101 @@ document.getElementById("jump-today").addEventListener("click", () => {
 // ============================================================
 // PART 7: Ideas board
 // ============================================================
-// State (render-from-data, like the To-Do app):
-//   userIdeas = [{ id, text }]  ideas friends added on THIS phone
-//   hearts    = { ideaId: count }  how many hearts each idea has
+// The Ideas board can get its data from TWO places:
+//   - LOCAL mode:  saved on this phone only (localStorage)
+//   - SHARED mode: saved in Supabase, so everyone sees the same board
 //
-// `hearts` is an object used like a lookup table: the key is the
-// idea's id and the value is its count. hearts["starter-0"] is the
-// number of hearts for the first starter idea.
+// Instead of writing the board twice, we use a "STORE": an object
+// that holds the data and knows how to change it. Both stores have
+// the SAME functions with the SAME names:
+//   getIdeas()       -> the current list (right now, no waiting)
+//   refresh()        -> fetch the latest list (local: nothing to do)
+//   addIdea(text)    heart(idea)    deleteIdea(id)
+// The drawing code below only ever talks to `ideaStore`, so it doesn't
+// know or care which store it got. Swapping one part for another
+// that has the same "shape" is a pattern you'll meet everywhere
+// (it's sometimes called an "adapter"). It's like a phone charger:
+// any plug that fits the socket works.
+//
+// Every idea, from either store, looks like:
+//   { id, text, count, who: ["Sam"], heartedByMe, canDelete }
+
+// ---- The LOCAL store (phone only) ----
+// userIdeas = [{ id, text }]  ideas added on THIS phone
+// hearts    = { ideaId: count }  a lookup table: idea id -> heart count
 let userIdeas = loadData("jv-ideas", []);
 let hearts = loadData("jv-hearts", {});
+
+const localIdeaStore = {
+  getIdeas() {
+    const starters = STARTER_IDEAS.map((text, index) => ({
+      id: "starter-" + index,
+      text: text,
+      canDelete: false,
+    }));
+    const mine = userIdeas.map((idea) => ({ ...idea, canDelete: true }));
+    // The "..." (spread) unpacks both arrays into one new array, then
+    // .map adds the heart info so it matches the shared store's shape.
+    return [...starters, ...mine].map((idea) => {
+      const count = hearts[idea.id] || 0; // `|| 0`: no count yet means 0
+      return { ...idea, count: count, who: [], heartedByMe: count > 0 };
+    });
+  },
+  // `async` so it matches the shared store. Nothing to fetch locally.
+  async refresh() {},
+  async addIdea(text) {
+    userIdeas.push({ id: String(Date.now()), text: text });
+    saveData("jv-ideas", userIdeas);
+  },
+  async heart(idea) {
+    // Locally each tap ADDS a heart: pass the phone round to vote!
+    hearts[idea.id] = (hearts[idea.id] || 0) + 1;
+    saveData("jv-hearts", hearts);
+  },
+  async deleteIdea(id) {
+    userIdeas = userIdeas.filter((idea) => idea.id !== id);
+    delete hearts[id]; // `delete` removes a key from an object
+    saveData("jv-ideas", userIdeas);
+    saveData("jv-hearts", hearts);
+  },
+};
+
+// Pick the store ONCE. sharedIdeaStore lives in shared.js.
+const ideaStore = API.enabled ? sharedIdeaStore : localIdeaStore;
 
 const ideaForm = document.getElementById("idea-form");
 const ideaInput = document.getElementById("idea-input");
 const ideaList = document.getElementById("idea-list");
 
-// Combine the starter ideas (from data.js) with the user's ideas
-// into ONE list of the same shape, so the render code can treat
-// them all the same way.
-function getAllIdeas() {
-  const starters = STARTER_IDEAS.map((text, index) => ({
-    id: "starter-" + index,
-    text: text,
-    isStarter: true,
-  }));
-  // The "..." (spread) unpacks both arrays into one new array.
-  return [...starters, ...userIdeas];
-}
+// The list as last drawn, so a click can find the idea it belongs to.
+let shownIdeas = [];
 
 function renderIdeas() {
   ideaList.innerHTML = "";
-  // Most-hearted first. `|| 0` means "if there's no count yet, use 0".
-  const sorted = getAllIdeas().sort(
-    (a, b) => (hearts[b.id] || 0) - (hearts[a.id] || 0)
-  );
+  // Most-hearted first. .slice() makes a copy so sorting doesn't
+  // shuffle the store's own list.
+  shownIdeas = ideaStore.getIdeas().slice().sort((a, b) => b.count - a.count);
 
-  sorted.forEach((idea) => {
+  shownIdeas.forEach((idea) => {
     const li = el("li", "card idea");
-    li.appendChild(el("span", "idea-text", idea.text));
+    const textBox = el("div", "idea-body");
+    textBox.appendChild(el("span", "idea-text", idea.text));
+    // In shared mode we know WHO hearted it.
+    if (idea.who.length > 0) {
+      textBox.appendChild(el("span", "idea-who", idea.who.join(", ")));
+    }
+    li.appendChild(textBox);
 
-    const count = hearts[idea.id] || 0;
-    const heartBtn = el("button", "heart-button", `♥ ${count}`);
+    const heartBtn = el("button", "heart-button", `♥ ${idea.count}`);
     heartBtn.type = "button";
     heartBtn.dataset.action = "heart";
     heartBtn.dataset.id = idea.id;
-    heartBtn.setAttribute("aria-label", `Add a heart to "${idea.text}" (${count} so far)`);
-    if (count > 0) heartBtn.classList.add("has-hearts");
+    heartBtn.setAttribute("aria-pressed", String(idea.heartedByMe));
+    heartBtn.setAttribute("aria-label", `Heart "${idea.text}" (${idea.count} so far)`);
+    if (idea.heartedByMe) heartBtn.classList.add("has-hearts");
     li.appendChild(heartBtn);
 
-    // Only ideas added on this phone can be deleted.
-    if (!idea.isStarter) {
+    if (idea.canDelete) {
       const deleteBtn = el("button", "delete-button", "✕");
       deleteBtn.type = "button";
       deleteBtn.dataset.action = "delete-idea";
@@ -466,42 +512,108 @@ function renderIdeas() {
   });
 }
 
-ideaForm.addEventListener("submit", (event) => {
+// Shows a short message to the user. In shared mode things can
+// fail (no signal, etc.), and silently doing nothing is confusing.
+// (`showToast` lives in shared.js; the fallback is a simple alert.)
+function reportError(error) {
+  const message = error.message || String(error);
+  if (typeof showToast === "function") {
+    showToast("⚠️ " + message);
+  } else {
+    alert(message);
+  }
+}
+
+// `async` event handler: lets us `await` the store inside it.
+ideaForm.addEventListener("submit", async (event) => {
   event.preventDefault();
   const text = ideaInput.value.trim();
   if (text === "") return;
-  // String(...) because the starter ids are text, and keeping every
-  // id the same type avoids confusing mismatches later.
-  userIdeas.push({ id: String(Date.now()), text: text });
-  saveData("jv-ideas", userIdeas);
-  ideaInput.value = "";
-  renderIdeas();
+  const button = ideaForm.querySelector("button");
+  button.disabled = true; // stop double-submits while we wait
+  try {
+    await ideaStore.addIdea(text);
+    await ideaStore.refresh();
+    ideaInput.value = "";
+    renderIdeas();
+  } catch (error) {
+    reportError(error);
+  } finally {
+    // `finally` runs whether it worked OR failed: always re-enable.
+    button.disabled = false;
+  }
 });
 
 // One listener for every heart and delete button (event delegation).
-ideaList.addEventListener("click", (event) => {
+ideaList.addEventListener("click", async (event) => {
   const button = event.target.closest("button");
   if (!button) return;
-  const id = button.dataset.id;
+  // dataset values are always text; ids may be numbers (shared) or
+  // text (local), so compare them both as text.
+  const idea = shownIdeas.find((item) => String(item.id) === button.dataset.id);
+  if (!idea) return;
 
-  if (button.dataset.action === "heart") {
-    // Each tap adds a heart. Pass the phone round to vote!
-    hearts[id] = (hearts[id] || 0) + 1;
-    saveData("jv-hearts", hearts);
-  } else if (button.dataset.action === "delete-idea") {
-    userIdeas = userIdeas.filter((idea) => idea.id !== id);
-    delete hearts[id]; // `delete` removes a key from an object
-    saveData("jv-ideas", userIdeas);
-    saveData("jv-hearts", hearts);
+  button.disabled = true;
+  try {
+    if (button.dataset.action === "heart") {
+      await ideaStore.heart(idea);
+    } else if (button.dataset.action === "delete-idea") {
+      if (!confirm(`Delete "${idea.text}"?`)) return;
+      await ideaStore.deleteIdea(idea.id);
+    }
+    await ideaStore.refresh();
+    renderIdeas();
+  } catch (error) {
+    reportError(error);
+  } finally {
+    button.disabled = false;
   }
-  renderIdeas();
 });
 
 
 // ============================================================
-// PART 8: Love thread
+// PART 8: Love thread (Billy's notes + friends' posts)
 // ============================================================
+// Billy's notes always come from data.js. Friends' posts come from a
+// store, the same trick as the Ideas board:
+//   - LOCAL mode:  text notes saved on this phone
+//   - SHARED mode: text, photo or video posts in Supabase
+// Every friend post, from either store, looks like:
+//   { id, from, text, createdAt, mediaUrl, mediaType, canDelete }
+
 let myNotes = loadData("jv-notes", []);
+
+const localNoteStore = {
+  getPosts() {
+    return myNotes.map((note) => ({
+      id: note.createdAt, // createdAt doubles as a unique id
+      from: note.from,
+      text: note.text,
+      createdAt: note.createdAt,
+      mediaUrl: null,
+      mediaType: null,
+      canDelete: true,
+    }));
+  },
+  hasMore() { return false; },
+  async loadMore() {},
+  async refresh() {},
+  async addPost(post) {
+    myNotes.push({
+      from: post.from,
+      text: post.text,
+      date: toDateKey(getToday()),
+      createdAt: Date.now(),
+    });
+    saveData("jv-notes", myNotes);
+  },
+  async deletePost(post) {
+    myNotes = myNotes.filter((note) => note.createdAt !== post.id);
+    saveData("jv-notes", myNotes);
+  },
+};
+
+const noteStore = API.enabled ? sharedNoteStore : localNoteStore;
 
 const noteForm = document.getElementById("note-form");
 const noteFrom = document.getElementById("note-from");
@@ -509,26 +621,33 @@ const noteText = document.getElementById("note-text");
 const noteList = document.getElementById("note-list");
 
 // Pre-fill the name box with whatever name was used last time, so
-// friends only have to type it once.
+// friends only have to type it once (local mode only).
 noteFrom.value = loadData("jv-my-name", "");
+
+// The friend posts as last drawn, so a delete click can find its post.
+let shownPosts = [];
 
 function renderNotes() {
   noteList.innerHTML = "";
   const today = getToday();
+  shownPosts = noteStore.getPosts();
 
-  // Mark Billy's notes and the user's notes so we can tell them
-  // apart, then join them into one list.
+  // Put Billy's notes and the friend posts into ONE list with a
+  // shared `sortKey` (milliseconds), so we can sort them together.
+  // new Date(x).getTime() turns a date into its millisecond number.
   const allNotes = [
-    ...LOVE_NOTES.map((note) => ({ ...note, isMine: false })),
-    ...myNotes.map((note) => ({ ...note, isMine: true })),
+    ...LOVE_NOTES.map((note) => ({
+      ...note,
+      kind: "billy",
+      sortKey: parseDate(note.date).getTime(),
+    })),
+    ...shownPosts.map((post) => ({
+      ...post,
+      kind: "friend",
+      sortKey: new Date(post.createdAt).getTime(),
+    })),
   ];
-
-  // Newest first. Sort by date, and if two notes share a date, use
-  // createdAt (only friend notes have it) to break the tie.
-  allNotes.sort((a, b) => {
-    if (a.date !== b.date) return b.date.localeCompare(a.date);
-    return (b.createdAt || 0) - (a.createdAt || 0);
-  });
+  allNotes.sort((a, b) => b.sortKey - a.sortKey); // newest first
 
   allNotes.forEach((note) => {
     // A note is sealed if it has an unlockDate that's still in the future.
@@ -547,11 +666,23 @@ function renderNotes() {
     }
 
     const card = el("div", "card note");
-    if (note.isMine) card.classList.add("mine");
+    if (note.kind === "friend") card.classList.add("mine");
 
-    if (note.photo) {
+    // Billy's notes use `photo`; shared posts use mediaUrl + mediaType.
+    const mediaUrl = note.photo || note.mediaUrl;
+    if (mediaUrl && note.mediaType === "video") {
+      const video = el("video", "note-photo");
+      video.src = mediaUrl;
+      video.controls = true;
+      // playsInline: play inside the card on iPhones instead of
+      // jumping to full screen. preload "metadata": only fetch the
+      // length and first frame until someone presses play.
+      video.playsInline = true;
+      video.preload = "metadata";
+      card.appendChild(video);
+    } else if (mediaUrl) {
       const img = el("img", "note-photo");
-      img.src = note.photo;
+      img.src = mediaUrl;
       img.alt = `Photo shared by ${note.from}`;
       // loading="lazy": don't download the image until it's about to
       // scroll into view. This saves data and makes the app open faster.
@@ -559,51 +690,70 @@ function renderNotes() {
       card.appendChild(img);
     }
 
-    card.appendChild(el("p", "note-text", note.text));
+    if (note.text) card.appendChild(el("p", "note-text", note.text));
     const footer = el("div", "note-footer");
     footer.appendChild(el("span", "note-from", `– ${note.from}`));
-    footer.appendChild(el("span", "muted", formatDate(parseDate(note.date))));
+    footer.appendChild(el("span", "muted", formatDate(new Date(note.sortKey))));
 
-    if (note.isMine) {
+    if (note.kind === "friend" && note.canDelete) {
       const deleteBtn = el("button", "delete-button", "✕");
       deleteBtn.type = "button";
-      deleteBtn.dataset.createdAt = note.createdAt;
-      deleteBtn.setAttribute("aria-label", "Delete this note");
+      deleteBtn.dataset.id = note.id;
+      deleteBtn.setAttribute("aria-label", "Delete this post");
       footer.appendChild(deleteBtn);
     }
     card.appendChild(footer);
     noteList.appendChild(card);
   });
+
+  // "Load more" appears only when the shared feed has older posts.
+  if (noteStore.hasMore()) {
+    const more = el("button", "pill-button load-more", "Load older posts");
+    more.type = "button";
+    more.dataset.action = "load-more";
+    noteList.appendChild(more);
+  }
 }
 
-noteForm.addEventListener("submit", (event) => {
+noteForm.addEventListener("submit", async (event) => {
   event.preventDefault();
+  // In shared mode, shared.js handles posting (photos, videos...).
+  if (API.enabled) return;
+
   const from = noteFrom.value.trim();
   const text = noteText.value.trim();
   if (from === "" || text === "") return;
-
-  myNotes.push({
-    from: from,
-    text: text,
-    date: toDateKey(getToday()),
-    createdAt: Date.now(), // also works as a unique id
-  });
-  saveData("jv-notes", myNotes);
+  await noteStore.addPost({ from: from, text: text });
   saveData("jv-my-name", from);
   noteText.value = "";
   renderNotes();
 });
 
-noteList.addEventListener("click", (event) => {
-  const button = event.target.closest(".delete-button");
+noteList.addEventListener("click", async (event) => {
+  const button = event.target.closest("button");
   if (!button) return;
-  // confirm() pops up an OK/Cancel box and gives back true or false.
-  if (!confirm("Delete this note?")) return;
-  // dataset values are always text, so we turn it back into a number.
-  const createdAt = Number(button.dataset.createdAt);
-  myNotes = myNotes.filter((note) => note.createdAt !== createdAt);
-  saveData("jv-notes", myNotes);
-  renderNotes();
+
+  try {
+    if (button.dataset.action === "load-more") {
+      button.disabled = true;
+      button.textContent = "Loading…";
+      await noteStore.loadMore();
+    } else if (button.classList.contains("delete-button")) {
+      // confirm() pops up an OK/Cancel box and gives back true or false.
+      if (!confirm("Delete this post?")) return;
+      const post = shownPosts.find((item) => String(item.id) === button.dataset.id);
+      if (!post) return;
+      button.disabled = true;
+      await noteStore.deletePost(post);
+      await noteStore.refresh();
+    } else {
+      return; // a click on something else, like a video's controls
+    }
+    renderNotes();
+  } catch (error) {
+    reportError(error);
+    renderNotes();
+  }
 });
 
 
@@ -910,6 +1060,12 @@ renderIdeas();
 renderNotes();
 renderBirthday();
 renderHighlights();
+
+// Shared mode (Supabase details filled in, in config.js)? Then
+// start sign-in, loading and live updates. See shared.js.
+if (API.enabled) {
+  startSharedMode();
+}
 
 // Which tab to start on? On the birthday itself, always open the
 // birthday tab (surprise!). Otherwise reopen the last tab used, or

@@ -21,7 +21,7 @@
 // ============================================================
 
 // Change this name if you ever want to throw away all old copies.
-const CACHE_NAME = "january-visit-v1";
+const CACHE_NAME = "january-visit-v2"; // v2: added the shared-mode files
 
 // The files that make up the app "shell". These get saved as soon as
 // the service worker installs, so offline works from the very
@@ -31,6 +31,10 @@ const APP_FILES = [
   "./index.html",
   "./style.css",
   "./data.js",
+  "./config.js",
+  "./api.js",
+  "./shared.js",
+  "./vendor/supabase-2.49.10.js",
   "./script.js",
   "./manifest.json",
   "./icons/icon-192.png",
@@ -73,6 +77,13 @@ self.addEventListener("activate", (event) => {
 self.addEventListener("fetch", (event) => {
   // Only handle simple "get me a file" requests.
   if (event.request.method !== "GET") return;
+
+  // Only handle OUR OWN files (same "origin" = same website). Requests
+  // to Supabase (data, sign-in, photos) go straight to the internet,
+  // untouched. Caching those here could show stale or private data,
+  // and the app already keeps its own offline copy (see shared.js).
+  // `return` without calling respondWith = "browser, do it normally".
+  if (new URL(event.request.url).origin !== self.location.origin) return;
 
   // event.respondWith(...) is how we hand back our own answer.
   event.respondWith(

@@ -32,6 +32,11 @@ responsive design. This project adds:
 - **The printable welcome card**: QR codes and error correction, SVG,
   `@media print` + `@page`, real-world units (`mm`), and reusing `data.js`
   across two pages (single source of truth)
+- **The shared backend (Supabase)**: databases and SQL, tables, keys and
+  foreign keys, authentication vs authorisation, Row Level Security, why the
+  "anon" key can be public, `async`/`await`, the data-layer and store
+  patterns, signed URLs, realtime/WebSockets, debouncing, cursor pagination,
+  shrinking photos with `<canvas>`, and vendoring a library
 - Smaller bits: the spread operator `...`, `.sort()` with a compare function,
   `padStart`, `.closest()`, `loading="lazy"`, `<figure>`/`<figcaption>`
 
@@ -253,3 +258,168 @@ the app. Print it and leave it on the guest bed.
 for boarding passes, and Spotify and WhatsApp have their own branded QR codes
 with a logo in the middle, using the same error-correction trick you used
 for the heart.
+
+---
+
+## Part 2: The shared backend (Supabase)
+
+Until now everything lived on one phone. This part makes ideas, hearts
+and a photo/video feed **shared** between everyone's phones. Code:
+`supabase/schema.sql`, `api.js`, `shared.js`, plus changes in `script.js`.
+
+### What a database is (and SQL)
+
+A database is a set of **tables**, which are like spreadsheets with strict
+rules. Columns have fixed types (text, number, date), and the database
+*refuses* data that breaks the rules: a 500-character idea, a post with
+nothing in it, a heart for an idea that doesn't exist. Even if our JavaScript
+has a bug, bad data can't get in.
+
+**SQL** is the language you talk to it in. You say *what* you want
+(`select ... from posts order by created_at desc`) and it works out *how*.
+
+**Real world:** Postgres, which Supabase runs on, powers Instagram, Spotify
+and Apple's services. SQL is nearly 50 years old and still one of the most
+in-demand skills in tech.
+
+### Keys: primary, foreign and combined
+
+- **Primary key:** the column that uniquely identifies a row, like a passport
+  number. `members` uses the email.
+- **Foreign key:** "this column must match a row in that other table".
+  `posts.author_email references members(email)` means a post can never belong
+  to someone who isn't on the guest list.
+- **Combined primary key:** `idea_hearts` uses `(idea_id, member_email)`
+  *together*, so the same person physically can't heart the same idea twice.
+  The rule lives in the database, not in our JavaScript.
+
+**Analogy:** a cinema seat is identified by row AND number together. Two
+people can't both be sold B7.
+
+### Authentication vs authorisation
+
+- **Authentication** = *who are you?* (the email code proves you own that inbox)
+- **Authorisation** = *what are you allowed to do?* (the guest list and the
+  RLS rules decide)
+
+You can be authenticated but not authorised: the 🔒 "not on the guest
+list" screen is exactly that.
+
+### Row Level Security, and why the anon key can be public
+
+Our app's code is public, so anyone could copy the Supabase address and key
+and send requests directly, skipping the app. That's fine, because the
+**database** checks every request against **policies** like "members can
+read posts" and "you can only delete rows where `author_email` is you". With
+RLS on, a table starts as *nobody can do anything*, and each policy opens
+one specific door.
+
+The `anon` key is like a building's street address: knowing it gets you to
+the door, not through it. The `service_role` key is the master key that
+skips RLS, and must never leave the dashboard.
+
+**We tested it** on a real local Postgres. A signed-out visitor and a
+stranger both saw 0 rows. Billy couldn't post as Sam, heart twice or upload
+into Sam's folder. Sam couldn't delete, edit or add himself to the guest
+list. (`schema.sql` explains each policy.)
+
+**Real world:** Supabase's whole security model is RLS. Firebase has
+"Security Rules", which work the same way. Leaving these off is behind many
+real data leaks, where an app's key was public and the database trusted it.
+
+### async / await
+
+Talking to a server takes time. An `async` function can `await` something
+slow ("pause here until the answer arrives") without freezing the app.
+`try/catch/finally` works with it: `catch` handles failure, and `finally`
+always runs, which we use to re-enable buttons whether a post worked or not.
+`Promise.all([a, b])` runs two fetches at the same time and waits for both.
+
+**Analogy:** ordering at a café counter. You don't stand frozen until your
+coffee's ready. You get a buzzer (`await`) and carry on.
+
+### Patterns that keep it tidy
+
+- **A data layer (`api.js`):** the *only* file that talks to Supabase. The
+  rest of the app calls plain functions like `API.addIdea(text)`. **Analogy:**
+  a waiter. You don't walk into the kitchen.
+- **Stores (an "adapter" pattern):** `localIdeaStore` and `sharedIdeaStore`
+  have *the same functions*, so the drawing code works with either and doesn't
+  know which one it has. That's how one app runs in local *or* shared mode.
+  **Analogy:** a phone charger. Any plug that fits the socket works.
+- **IIFE:** `const API = (() => { ... return {...}; })()` keeps everything
+  inside private, and only what's returned is public.
+- **Vendoring:** we saved a copy of the Supabase library in `vendor/`, so it
+  works offline and can never change version under us.
+
+**Real world:** Shopify, Airbnb and most big apps keep a data layer between
+their screens and their servers. It's what lets them swap databases without
+rewriting the app.
+
+### Files: storage, signed URLs and shrinking photos
+
+- Big files go in **Storage** (a bucket, like a shared drive folder). The
+  `posts` table just stores the file's *path*, like a library catalogue card
+  saying which shelf a book is on.
+- The bucket is **private**, so photos need **signed URLs**: temporary links
+  with a secret signature that expire after an hour. Even if a link leaks, it
+  stops working.
+- Before uploading, `shrinkPhoto()` draws the photo onto a `<canvas>` at
+  1600px and saves it as JPEG at 80% quality. In our test a 224 KB image
+  became 19 KB, and a real 5 MB phone photo becomes about 300 KB. That's
+  faster, kinder on data, and many more photos fit in the free 1 GB.
+- `canvas.toBlob` uses an old *callback* style, so we wrap it in
+  `new Promise(...)` to `await` it, a useful trick for older browser features.
+- Videos are checked **before** uploading. A 60 MB clip is rejected
+  instantly instead of after a wasted upload.
+
+**Real world:** WhatsApp and Instagram both shrink photos on your phone
+before sending, which is why they upload so fast. Signed URLs are how
+Dropbox and Google Drive share private files.
+
+### Realtime, debouncing and pagination
+
+- **Realtime:** a **WebSocket** is a connection that stays open, so the server
+  can *push* "Sam just posted" instead of the app asking every few seconds.
+  The database still applies RLS to what it announces.
+- **Debouncing:** several changes often arrive together, so we wait 400 ms
+  for things to go quiet, then reload once. **Analogy:** a lift waiting a
+  moment for more people before closing its doors.
+- **Cursor pagination:** the feed loads 20 posts, and "Load older posts" asks
+  for "20 older than the oldest one I have". Instagram's infinite scroll works
+  the same way.
+
+### Offline, and the `hidden` gotcha
+
+- The last ideas and posts are cached in `localStorage`. If the app opens
+  with no signal, it shows those with a "📴 Offline" note, and Post and Add
+  are greyed out until the signal returns (the `online`/`offline` events).
+- The service worker now only caches **our own** files. Supabase data
+  goes straight to the network, so private data never sits in the shared cache.
+- **A bug we caught in testing:** the post form should hide when you're
+  signed out, but `.note-form { display: flex }` quietly overrode the
+  `hidden` attribute. The fix, `[hidden] { display: none !important; }`, is
+  a rule many professional stylesheets include for exactly this reason.
+
+### Email: why we needed our own sender
+
+Supabase's free built-in email only sends to people on your Supabase team
+(about 2 an hour), to stop spammers abusing it. So sign-in codes go out
+through Billy's Gmail using **SMTP**, the standard protocol that sends
+every email on the internet. An "app password" lets Supabase send as Billy
+without knowing his real password.
+
+### How we tested without a real Supabase
+
+1. **Database rules:** ran `schema.sql` (twice, to prove it's safe to
+   re-run) on a local Postgres 16, with small stand-ins for Supabase's
+   sign-in and storage pieces, then tried each allowed and forbidden action
+   as different people.
+2. **The app:** wrote a *fake* Supabase library for the browser test only
+   (never shipped) that follows the same rules, then drove the app
+   through 39 checks: sign-in, the guest list, hearts, posts, photos, videos,
+   live updates, paging, offline and sign-out.
+
+**Real world:** this is called **mocking**: replacing a real service with a
+pretend one so you can test your own code quickly and reliably. Almost every
+professional test suite does it.

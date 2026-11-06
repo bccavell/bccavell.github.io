@@ -106,7 +106,14 @@ App Store listing. Neither matters for 3 to 5 friends.
 - **Limits (free plan, check current pricing):** about 1 GB of storage,
   about 50 MB per file, and the project pauses after about a week idle.
   Photos are resized in the browser, and videos are capped at short clips.
-- **Pending decisions:** see ticket JV-27.
+- **Decisions (6 Nov 2026, LOR-31):** ✅ Supabase · ✅ sign-in with an email
+  code (6 digits) plus a magic link · ✅ short video clips on the free plan
+  (50 MB max, checked before upload).
+- **Email sending:** Supabase's built-in email only reaches your own team
+  (2 per hour), so sign-in codes go out through Billy's Gmail (custom SMTP).
+  See `supabase/SETUP.md`.
+- **Two modes:** with `config.js` blank the app runs in *local mode*, as
+  in v1. Once it's filled in, *shared mode* turns on.
 
 ## 5. Data model (`data.js`)
 

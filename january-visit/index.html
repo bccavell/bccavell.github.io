@@ -47,6 +47,8 @@
   <header class="app-header">
     <h1 id="app-title">Our January</h1>
     <p id="app-subtitle" class="muted"></p>
+    <!-- "Signed in as Sam · Sign out" (shared mode only) -->
+    <p id="account-bar" class="account-bar" hidden></p>
   </header>
 
   <!--
@@ -94,21 +96,42 @@
     <section id="tab-ideas" class="tab-panel" aria-labelledby="nav-ideas" hidden>
       <h2>Ideas board</h2>
       <p class="muted">What do you want to do? Heart the ones you love ♥</p>
-      <!-- Same <form> trick as the To-Do app: pressing Enter submits it. -->
-      <form id="idea-form" class="inline-form">
-        <input id="idea-input" type="text" placeholder="e.g. Go to a comedy show" autocomplete="off" maxlength="120" required />
-        <button type="submit">Add</button>
-      </form>
-      <ul id="idea-list" class="idea-list"></ul>
+      <!-- Shared mode: the sign-in card appears here until you're in. -->
+      <div id="ideas-gate"></div>
+      <div id="ideas-content">
+        <!-- Same <form> trick as the To-Do app: pressing Enter submits it. -->
+        <form id="idea-form" class="inline-form">
+          <input id="idea-input" type="text" placeholder="e.g. Go to a comedy show" autocomplete="off" maxlength="120" required />
+          <button type="submit">Add</button>
+        </form>
+        <ul id="idea-list" class="idea-list"></ul>
+      </div>
     </section>
 
     <!-- ===== LOVE THREAD ===== -->
     <section id="tab-love" class="tab-panel" aria-labelledby="nav-love" hidden>
       <h2>Love thread 💌</h2>
+      <!-- Shared mode: the sign-in card appears here until you're in. -->
+      <div id="love-gate"></div>
       <form id="note-form" class="note-form card">
+        <!-- The name box is only for local mode. In shared mode your
+             name comes from the guest list. -->
         <input id="note-from" type="text" placeholder="Your name" autocomplete="name" maxlength="40" required />
         <textarea id="note-text" rows="3" placeholder="Leave a little love…" maxlength="1000" required></textarea>
-        <button type="submit">Post 💛</button>
+        <!--
+          The photo/video picker (shared mode only). A real
+          <input type="file"> is ugly and hard to style, so we hide it
+          and use a <label> styled as a button: tapping a label
+          "clicks" the input it's linked to with for="...".
+          accept="image/*,video/*" opens the camera roll on phones.
+        -->
+        <div class="media-row">
+          <label for="note-file" class="pill-button media-button">📷 Photo / video</label>
+          <input id="note-file" type="file" accept="image/*,video/*" class="visually-hidden" />
+          <div id="note-preview" class="note-preview"></div>
+        </div>
+        <p id="note-status" class="muted note-status" aria-live="polite"></p>
+        <button id="note-submit" type="submit">Post 💛</button>
       </form>
       <div id="note-list"></div>
     </section>
@@ -153,7 +176,20 @@
     ORDER MATTERS: data.js has to load first so that its TRIP,
     ITINERARY, etc. already exist by the time script.js runs.
   -->
+  <!--
+    Load order (top to bottom):
+      data.js     - your content
+      config.js   - Supabase address + public key (blank = local mode)
+      vendor/...  - the Supabase library (creates window.supabase)
+      api.js      - the ONLY file that talks to Supabase
+      shared.js   - sign-in, shared stores, photo posting, live updates
+      script.js   - the app itself (uses everything above)
+  -->
   <script src="data.js"></script>
+  <script src="config.js"></script>
+  <script src="vendor/supabase-2.49.10.js"></script>
+  <script src="api.js"></script>
+  <script src="shared.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
